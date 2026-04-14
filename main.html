@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Substrata</title>
+
+<style>
+  @font-face {
+    font-family: 'ants';
+    src: url('fonts/ants.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face{ 
+    font-family: 'TokytoC';
+    src: url('fonts/TokytoC.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #d6ddd0;
+  --bg-warm: #e2e8dc;
+  --glass: rgba(220, 230, 218, 0.45);
+  --glass-border: rgba(255,255,255,0.55);
+  --mint: #aac4b8;
+  --mint-deep: #7aa898;
+  --mint-pale: #c8dbd4;
+  --cream: #f0ede4;
+  --cream-dark: #e0dbd0;
+  --text: #3a4a42;
+  --text-mid: #6a7e74;
+  --text-dim: #9aada4;
+  --pill-bg: #e8ece0;
+  --pill-border: rgba(255,255,255,0.7);
+  --pill-inset: rgba(0,0,0,0.08);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+/* ── NOISE LAYER ── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ── GLASS CARD MIXIN ── */
+.glass {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 24px;
+}
+
+/* ── PILL LABEL ── */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--pill-bg);
+  border: 1px solid var(--pill-border);
+  border-radius: 100px;
+  padding: 0.35rem 1rem;
+  font-size: 0.6rem;
+  font-family: 'ants', sans-serif;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--text-mid);
+  box-shadow: inset 0 1px 3px var(--pill-inset), 0 1px 0 rgba(255,255,255,0.6);
+}
+
+.eyebrow-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.eyebrow-container {
+    background-color: #000000;
+    color: white;
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 14px; 
+}
+
+.hero-eyebrow {
+  font-family: 'ants';
+  display: inline-block;
+  font-size: 2rem;
+  padding-left: 100%;
+  animation: scrollText 25s linear infinite;
+}
+
+@keyframes scrollText {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+ 
+
+/* ════════════════════════════
+   HERO
+════════════════════════════ */
+.hero {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  padding: 3rem;
+}
+
+/* soft radial glow behind the form */
+.hero::before {
+  content: '';
+  position: absolute;
+  right: 5%;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 55vw;
+  height: 55vw;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(170,196,184,0.35) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-container {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.hero-title {
+  justify-items: center;
+  font-size: clamp(4.5rem, 9vw, 9rem);
+}
+
+.hero-sub {
+  font-size: 0.72rem;
+  line-height: 2;
+  color: var(--text-mid);
+  letter-spacing: 0.02em;
+}
+
+.hero-pills {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.hero-right {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.hero-card {
+  display: grid;
+  justify-items: center;
+  width: 90vw;
+  border-radius: 28px;
+  background: rgba(200,219,212,0.3);
+  border: 1px solid rgba(255,255,255,0.5);
+}
+
+.hero-card-img {
+  display: grid;  
+  justify-items: center;
+  width: 90vw;
+  height: auto;
+}
+
+.hero-card-overlay {
+  width: 90vw;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 50%, rgba(190,210,200,0.4) 100%);
+}
+
+/* shadow effect here */
+.spotlight-section {
+  position: relative; 
+  overflow: hidden;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle 140px at 50% 50%, transparent 0%, rgb(0,0,0,0.92) 100%);
+}
+
+.letter-pill {
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  background: var(--pill-bg);
+  border: 1px solid var(--pill-border);
+  box-shadow: inset 0 2px 4px var(--pill-inset), 0 1px 0 rgba(255,255,255,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--text-mid);
+  letter-spacing: -0.03em;
+}
+
+/* ════════════════════════════
+   MARQUEE
+════════════════════════════ */
+.marquee-wrap {
+  overflow: hidden;
+  border-top: 1px solid rgba(100,140,120,0.15);
+  border-bottom: 1px solid rgba(100,140,120,0.15);
+  padding: 1.2rem 0;
+  background: var(--bg-warm);
+}
+
+.marquee-track {
+  display: flex;
+  gap: 3rem;
+  animation: marquee 22s linear infinite;
+  width: max-content;
+}
+
+@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* ════════════════════════════
+   QUOTE 1
+════════════════════════════ */
+.quote-1 {
+  padding: 8rem 7vw;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 5rem;
+  align-items: center;
+  border-bottom: 1px solid rgba(100,140,120,0.1);
+}
+
+.q1-aside {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.q1-num {
+  font-family: 'DM Serif Display', serif;
+  font-size: 6rem;
+  color: rgba(100,160,130,0.12);
+  line-height: 1;
+}
+
+.q1-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.q1-text {
+  font-family: 'DM Serif Display', serif;
+  font-style: italic;
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.q1-attr {
+  font-size: 0.6rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(100,140,120,0.15);
+}
+
+/* ════════════════════════════
+   MAP SECTION
+════════════════════════════ */
+.map-section {
+  padding: 6rem 5vw;
+  background: var(--bg-warm);
+}
+
+.map-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 3rem;
+  padding: 0 2vw;
+}
+
+.map-title-group { display: flex; flex-direction: column; gap: 1rem; }
+
+.map-title {
+  font-family: 'TokytoC';
+  font-size: clamp(2.2rem, 4vw, 3.5rem);
+  color: var(--text);
+}
+
+.map-glass {
+  background: rgba(200, 215, 208, 0.4);
+  border: 1px solid rgba(255,255,255,0.6);
+  border-radius: 24px;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.map-svg-wrap {
+  width: 100%;
+  aspect-ratio: 16/9;
+}
+
+/* ════════════════════════════
+   STATS
+════════════════════════════ */
+.stats-band {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 1.5rem;
+  gap: 1rem;
+}
+
+.stat-glass {
+  background: rgba(200,215,208,0.4);
+  border: 1px solid rgba(255,255,255,0.6);
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+}
+
+.stat-n {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  color: var(--mint-deep);
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.stat-l {
+  font-size: 0.58rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+/* ════════════════════════════
+   STRATA SECTION
+════════════════════════════ */
+.strata-section {
+  padding: 8rem 7vw;
+}
+
+.strata-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  margin-bottom: 5rem;
+  align-items: end;
+}
+
+.strata-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  color: var(--text);
+  line-height: 1.1;
+}
+
+.strata-intro {
+  font-size: 0.72rem;
+  line-height: 2;
+  color: var(--text-mid);
+}
+
+.strata-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.strata-card {
+  background: rgba(200,215,208,0.35);
+  border: 1px solid rgba(255,255,255,0.55);
+  border-radius: 20px;
+  padding: 2.2rem 1.8rem;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.35s, transform 0.3s;
+  cursor: default;
+}
+
+.strata-card:hover {
+  background: rgba(200,215,208,0.6);
+  transform: translateY(-4px);
+}
+
+.strata-card-num {
+  font-family: 'DM Serif Display', serif;
+  font-size: 4rem;
+  color: rgba(100,160,130,0.1);
+  line-height: 1;
+  position: absolute;
+  top: 1rem;
+  right: 1.2rem;
+}
+
+.strata-depth {
+  font-size: 0.56rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.depth-pip {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--mint-deep);
+  opacity: 0.5;
+}
+
+.strata-name {
+  font-size: 1.25rem;
+  color: var(--text);
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.strata-desc {
+  font-size: 0.7rem;
+  line-height: 1.9;
+  color: var(--text-mid);
+}
+
+/* ════════════════════════════
+   QUOTE 2
+════════════════════════════ */
+.quote-2-section {
+  background: var(--text);
+  padding: 8rem 7vw;
+  position: relative;
+  overflow: hidden;
+}
+
+.quote-2-section::before {
+  content: '';
+  position: absolute;
+  left: -10%;
+  top: -20%;
+  width: 60vw;
+  height: 60vw;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(170,196,184,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.q2-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2.5rem;
+}
+
+.q2-text {
+  font-family: 'DM Serif Display', serif;
+  font-style: italic;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  color: var(--cream);
+  line-height: 1.5;
+}
+
+.q2-text em {
+  font-style: normal;
+  color: var(--mint-pale);
+}
+
+.q2-attr {
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(200,219,212,0.4);
+}
+
+/* ════════════════════════════
+   FINAL CTA
+════════════════════════════ */
+.final-section {
+  padding: 10rem 7vw;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6rem;
+  align-items: center;
+}
+
+.final-left { display: flex; flex-direction: column; gap: 2.5rem; }
+
+.final-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  line-height: 1.1;
+  color: var(--text);
+}
+
+.final-title em { font-style: italic; color: var(--mint-deep); }
+
+.final-body {
+  font-size: 0.72rem;
+  line-height: 2;
+  color: var(--text-mid);
+  max-width: 380px;
+}
+
+.final-right {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-glass {
+  background: rgba(200,215,208,0.35);
+  border: 1px solid rgba(255,255,255,0.6);
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.form-label {
+  font-size: 0.58rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 0.4rem;
+  display: block;
+}
+
+.form-input {
+  width: 100%;
+  background: rgba(255,255,255,0.5);
+  border: 1px solid rgba(255,255,255,0.7);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--text);
+  outline: none;
+  transition: border 0.2s, background 0.2s;
+}
+.form-input::placeholder { color: var(--text-dim); }
+.form-input:focus {
+  border-color: var(--mint-deep);
+  background: rgba(255,255,255,0.7);
+}
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+.form-submit {
+  width: 100%;
+  background: var(--text);
+  color: var(--cream);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  padding: 1rem;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s;
+  margin-top: 0.5rem;
+}
+.form-submit:hover { background: var(--mint-deep); }
+
+/* ════════════════════════════
+   FOOTER
+════════════════════════════ */
+footer {
+  border-top: 1px solid rgba(100,140,120,0.15);
+  padding: 2rem 7vw;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.58rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+/* ════════════════════════════
+   RESPONSIVE
+════════════════════════════ */
+@media (max-width: 900px) {
+  .hero { grid-template-columns: 1fr; padding: 8rem 6vw 4rem; gap: 4rem; }
+  .hero::before { display: none; }
+  .hero-right { justify-content: flex-start; }
+  .hero-card { width: 100%; }
+  .letter-pills { right: -0.8rem; }
+  .quote-1 { grid-template-columns: 1fr; gap: 2rem; }
+  .q1-num { display: none; }
+  .strata-grid { grid-template-columns: repeat(2, 1fr); }
+  .strata-header { grid-template-columns: 1fr; gap: 2rem; }
+  .final-section { grid-template-columns: 1fr; gap: 4rem; }
+  .stats-band { grid-template-columns: 1fr; }
+  footer { flex-direction: column; gap: 1rem; text-align: center; }
+}
+
+@media (max-width: 550px) {
+  .strata-grid { grid-template-columns: 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+  .map-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+}
+</style>
+</head>
+<!----------------HTML HEREEEEEEEEEEE--------------------->
+<!-----------------------------------------nnnn------------------------------------------->
+<body>
+
+<!-- ════ HERO ════ -->
+
+<div class="eyebrow wrap">
+    <div class="eyebrow-container">
+      <div class="hero-eyebrow">Loneliness is a surface world condition. We are the cure.</div>
+    </div>
+    </div>
+  
+  
+<section class="hero">
+  <div class="hero-container">
+
+    <h1 class="hero-title">
+      <img src="names/substrata.png" alt="Echelon logo" style="height:1.2em; vertical-align:middle;">
+    </h1>
+
+    <p class="hero-sub">Substrata was not built—it was excavated. <br><br> Chamber by chamber, passage by passage, its founders carved meaning from earth and stone, studying systems that had long existed beneath notice—ant colonies, their density, their persistence, the way they appear precisely when absence feels most complete. What emerged was not merely shelter, but a system. A living geometry of mutual purpose. <br> <br> Here, there is no sky to distract. Only the hum of tunnels, the warmth held in shared walls, the low, constant movement of something continuing. Every resident is both cell and organism. Every corridor connects. Solitude dissolves where the whole persists. </p>
+
+    <div class="hero-pills">
+      <span class="pill">4 Strata</span>
+      <span class="pill">58m Depth</span>
+      <span class="pill">12,000 Residents</span>
+    </div>
+
+    <div class="glass">
+    </div>
+
+ <section class="spotlight-section">
+    <div class="hero-card">
+      <img class="hero-card-img" src="images/aaa.png" alt="3D">
+      <div class="hero-card-overlay"></div>
+  </div> 
+  <div class="overlay" id="overlay"></div>
+  </section>
+</section>
+
+
+<!-- ════ QUOTE 1 ════ -->
+<div class="quote-1">
+  <div class="q1-aside">
+    <div class="q1-num">01</div>
+    <div class="q1-label">Founding Charter</div>
+  </div>
+  <div>
+    <p class="q1-text">"Loooooonnggggg quote goes here"</p>
+    <p class="q1-attr">— Founding Charter of Echelon, Year Zero</p>
+  </div>
+</div>
+
+<!-- ════ MAP ════ -->
+<section class="map-section">
+  <div class="map-header">
+    <div class="map-title-group">
+      <span class="pill" style="width:fit-content;">Cartography · Level Survey</span>
+      <h2 class="map-title">The Colony, Mapped</h2>
+    </div>
+    <span class="pill">Cross-section · Not to scale</span>
+  </div>
+
+  <div class="map-glass" style="padding: 0; overflow: hidden;">
+    <img src="/mnt/user-data/uploads/jjjjjnn.png" alt="Echelon Colony Map" style="width: 100%; height: 100%; object-fit: cover; display: block; mix-blend-mode: multiply;">
+  </div>
+
+  <div class="stats-band">
+    <div class="stat-glass">
+      <div class="stat-n">?</div>
+      <div class="stat-l">Maximum Depth</div>
+    </div>
+    <div class="stat-glass">
+      <div class="stat-n">?</div>
+      <div class="stat-l">Strata</div>
+    </div>
+    <div class="stat-glass">
+      <div class="stat-n">?</div>
+      <div class="stat-l">Residents</div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ STRATA ════ -->
+<section class="strata-section">
+  <div class="strata-header">
+    <div>
+      <span class="pill" style="margin-bottom:1.2rem; display:inline-flex;">Social Architecture</span>
+      <h2 class="strata-title">The Four<br><em>
+        <img src="names/strata.png" alt="Strata" style="height:1.2em; vertical-align:middle;">
+      </em></h2>
+    </div>
+    <p class="strata-intro">Echelon is a stratified colony. Depth is not a logistic — it is a social contract. Each stratum has its own light, its own language, and its own law.</p>
+  </div>
+
+  <div class="strata-grid">
+    <div class="strata-card">
+      <div class="strata-card-num">I</div>
+      <div class="strata-depth"><div class="depth-pip"></div>0 – 12 metres</div>
+      <h3 class="strata-name">The Threshold</h3>
+      <p class="strata-desc">Entry halls, transit bays, welcome chambers. New arrivals begin here. Light still filters through the grates above. The air smells of outside.</p>
+    </div>
+    <div class="strata-card">
+      <div class="strata-card-num">II</div>
+      <div class="strata-depth"><div class="depth-pip"></div>12 – 28 metres</div>
+      <h3 class="strata-name">The Working Belt</h3>
+      <p class="strata-desc">Markets, council halls, workshops, residences for the laboring class. The hum of the colony is loudest here. No natural light penetrates this far.</p>
+    </div>
+    <div class="strata-card">
+      <div class="strata-card-num">III</div>
+      <div class="strata-depth"><div class="depth-pip"></div>28 – 44 metres</div>
+      <h3 class="strata-name">The Inner Ring</h3>
+      <p class="strata-desc">Archives, nurseries, food stores. Only those with clearance descend here. The walls glow faintly with bioluminescent moss. Time moves differently.</p>
+    </div>
+    <div class="strata-card">
+      <div class="strata-card-num">IV</div>
+      <div class="strata-depth"><div class="depth-pip"></div>44 – 58 metres</div>
+      <h3 class="strata-name">The Queen's Ward</h3>
+      <p class="strata-desc">Reserved. The deepest and most sacred stratum. Access is not granted — it is inherited. Those who dwell here have never seen the surface.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════ QUOTE 2 (dark) ════ -->
+<div class="quote-2-section">
+  <div class="q2-inner">
+    <span class="pill" style="opacity:0.4;"></span>
+    <p class="q2-text">"Quotes from residents <em>here,,</em>."</p>
+    <p class="q2-attr"> resident name, 15th year</p>
+  </div>
+</div>
+
+<!-- ════ FINAL CTA ════ -->
+<section class="final-section">
+  <div class="final-left">
+    <span class="pill" style="width:fit-content;">Residency Programme</span>
+    <h2 class="final-title">A place for those who<br>want to go <em>deeper</em></h2>
+    <p class="final-body">Applications are reviewed by the Stratum Council. Placement is determined by function, not preference. All residents begin in Stratum I.</p>
+  </div>
+
+  <div class="final-right">
+    <div class="form-glass">
+      <div class="form-row">
+        <div>
+          <label class="form-label">Full Name</label>
+          <input class="form-input" type="text" placeholder="First and Last">
+        </div>
+        <div>
+          <label class="form-label">Age</label>
+          <input class="form-input" type="text" placeholder="Worker / Scout">
+        </div>
+      </div>
+      <div>
+        <label class="form-label">Contact</label>
+        <input class="form-input" type="email" placeholder="signal@echelon.col">
+      </div>
+      <div>
+        <label class="form-label">Preferred stratum</label>
+        <input class="form-input" type="text" placeholder="State your depth">
+      </div>
+      <button class="form-submit">Submit Application</button>
+    </div>
+  </div>
+</section>
+
+<!-- ════ FOOTER ════ -->
+<footer>
+  <span>Colony · Est. Year Zero</span>
+  <span>All strata · All depths</span>
+  <span>You are here</span>
+</footer>
+
+</body>
+<script>
+  const section = document.querySelector('.spotlight-section');
+const overlay = document.getElementById('overlay');
+
+section.addEventListener('mousemove', e => {
+  const r = section.getBoundingClientRect();
+  const x = ((e.clientX - r.left) / r.width * 100) + '%';
+  const y = ((e.clientY - r.top) / r.height * 100) + '%';
+  overlay.style.background =
+    `radial-gradient(circle 140px at ${x} ${y}, transparent 0%, rgba(0,0,0,0.92) 100%)`;
+});
+
+// optional: reset when cursor leaves the section
+section.addEventListener('mouseleave', () => {
+  overlay.style.background =
+    `radial-gradient(circle 140px at 50% 50%, transparent 0%, rgba(0,0,0,0.92) 100%)`;
+});
+</script>
+
+</html>
