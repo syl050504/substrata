@@ -22,7 +22,29 @@
     font-display: swap;
   }
 
+  @font-face {
+    font-family: "ortica";
+    src: url("fonts/ortica.otf") format("opentype");
+}
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+.fixed-sidebar {
+  position: fixed;
+  right: 1rem; /* Distance from the right edge */
+  top: 50%;    /* Start at the middle of the screen */
+  transform: translateY(-50%); /* Perfectly center it vertically */
+  z-index: 100; /* Ensure it stays on top of other content */
+  pointer-events: none; /* Allows clicks to pass through to content behind it */
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.fixed-sidebar img {
+  width: 70px; /* Adjust the width to whatever size looks best */
+  height: auto;
+  display: block;
+}
 
 :root {
   --bg: #d6ddd0;
@@ -131,20 +153,6 @@ body::after {
   padding: 3rem;
 }
 
-/* soft radial glow behind the form */
-.hero::before {
-  content: '';
-  position: absolute;
-  right: 5%;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 55vw;
-  height: 55vw;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(170,196,184,0.35) 0%, transparent 70%);
-  pointer-events: none;
-}
-
 .hero-container {
   position: relative;
   z-index: 2;
@@ -154,8 +162,12 @@ body::after {
 }
 
 .hero-title {
+  display:grid;
   justify-items: center;
-  font-size: clamp(4.5rem, 9vw, 9rem);
+}
+
+.hero-title img {
+  width: 90vw;
 }
 
 .hero-sub {
@@ -169,49 +181,6 @@ body::after {
   display: flex;
   gap: 0.6rem;
   flex-wrap: wrap;
-}
-
-.hero-right {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2;
-}
-
-.hero-card {
-  display: grid;
-  justify-items: center;
-  width: 90vw;
-  border-radius: 28px;
-  background: rgba(200,219,212,0.3);
-  border: 1px solid rgba(255,255,255,0.5);
-}
-
-.hero-card-img {
-  display: grid;  
-  justify-items: center;
-  width: 90vw;
-  height: auto;
-}
-
-.hero-card-overlay {
-  width: 90vw;
-  inset: 0;
-  background: linear-gradient(to bottom, transparent 50%, rgba(190,210,200,0.4) 100%);
-}
-
-/* shadow effect here */
-.spotlight-section {
-  position: relative; 
-  overflow: hidden;
-}
-
-.overlay {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(circle 140px at 50% 50%, transparent 0%, rgb(0,0,0,0.92) 100%);
 }
 
 .letter-pill {
@@ -652,6 +621,9 @@ footer {
 <body>
 
 <!-- ════ HERO ════ -->
+<div class="fixed-sidebar">
+  <img src="names/print.png" alt="Substrata">
+</div>
 
 <div class="eyebrow wrap">
     <div class="eyebrow-container">
@@ -664,7 +636,7 @@ footer {
   <div class="hero-container">
 
     <h1 class="hero-title">
-      <img src="names/substrata.png" alt="Echelon logo" style="height:1.2em; vertical-align:middle;">
+      <img src="names/substrata.png" alt="Echelon logo">
     </h1>
 
     <p class="hero-sub">Substrata was not built—it was excavated. <br><br> Chamber by chamber, passage by passage, its founders carved meaning from earth and stone, studying systems that had long existed beneath notice—ant colonies, their density, their persistence, the way they appear precisely when absence feels most complete. What emerged was not merely shelter, but a system. A living geometry of mutual purpose. <br> <br> Here, there is no sky to distract. Only the hum of tunnels, the warmth held in shared walls, the low, constant movement of something continuing. Every resident is both cell and organism. Every corridor connects. Solitude dissolves where the whole persists. </p>
@@ -677,11 +649,7 @@ footer {
 
     <div class="glass">
     </div>
-
- <section class="spotlight-section">
-    <div class="hero-card">
-      <img class="hero-card-img" src="images/aaa.png" alt="3D">
-      <div class="hero-card-overlay"></div>
+ 
   </div> 
   <div class="overlay" id="overlay"></div>
   </section>
@@ -822,21 +790,32 @@ footer {
 </body>
 <script>
   const section = document.querySelector('.spotlight-section');
-const overlay = document.getElementById('overlay');
+  const overlay = document.getElementById('overlay');
 
-section.addEventListener('mousemove', e => {
-  const r = section.getBoundingClientRect();
-  const x = ((e.clientX - r.left) / r.width * 100) + '%';
-  const y = ((e.clientY - r.top) / r.height * 100) + '%';
-  overlay.style.background =
-    `radial-gradient(circle 140px at ${x} ${y}, transparent 0%, rgba(0,0,0,0.92) 100%)`;
-});
+  if (section && overlay) {
+    section.addEventListener('mousemove', e => {
+      const r = section.getBoundingClientRect();
+      const x = ((e.clientX - r.left) / r.width * 100) + '%';
+      const y = ((e.clientY - r.top) / r.height * 100) + '%';
+      overlay.style.background =
+        `radial-gradient(circle 140px at ${x} ${y}, transparent 0%, rgba(0,0,0,0.92) 100%)`;
+    });
 
-// optional: reset when cursor leaves the section
-section.addEventListener('mouseleave', () => {
-  overlay.style.background =
-    `radial-gradient(circle 140px at 50% 50%, transparent 0%, rgba(0,0,0,0.92) 100%)`;
-});
+    section.addEventListener('mouseleave', () => {
+      overlay.style.background =
+        `radial-gradient(circle 140px at 50% 50%, transparent 0%, rgba(0,0,0,0.92) 100%)`;
+    });
+  }
+
+  const heroLogo = document.querySelector('.hero-title img');
+  const sidebar = document.querySelector('.fixed-sidebar');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      sidebar.style.opacity = entry.isIntersecting ? '0' : '1';
+    });
+  });
+
+  observer.observe(heroLogo);
 </script>
-
 </html>
