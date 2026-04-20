@@ -1,1038 +1,1783 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Substrata</title>
-<style>
-@font-face { font-family:'ants';       src:url('fonts/ants.otf') format('opentype'); font-display:swap; }
-@font-face { font-family:'TokytoC';    src:url('fonts/TokytoC.otf') format('opentype'); font-display:swap; }
-@font-face { font-family:'TokytoThin'; src:url('fonts/Tokyto-trial-Thin-C copy.otf') format('opentype'); font-display:swap; }
-@font-face { font-family:'ortica';     src:url('fonts/ortica.otf') format('opentype'); font-display:swap; }
-@font-face { font-family:'Parasitype'; src:url('fonts/Parasitype.otf') format('opentype'); font-display:swap; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Substrata</title>
+  <link rel="stylesheet" href="https://use.typekit.net/wqy7bba.css">
+  <style>
+    @font-face {
+      font-family: 'ants';
+      src: url('fonts/ants.otf') format('opentype');
+      font-display: swap;
+    }
 
-*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+    @font-face {
+      font-family: 'TokytoC';
+      src: url('fonts/TokytoC.otf') format('opentype');
+      font-display: swap;
+    }
 
-:root {
-  --sage:       #c8d4c0;
-  --sage-mid:   #b8c8b2;
-  --mint:       #aac4b8;
-  --mint-deep:  #7aa898;
-  --mint-pale:  #c8dbd4;
-  --cream:      #f0ede4;
-  --text:       #3a4a42;
-  --text-mid:   #6a7e74;
-  --text-dim:   #9aada4;
-  /* glass recipe — all panels share this */
-  --g-bg:       rgba(210,225,212,0.48);
-  --g-border:   rgba(255,255,255,0.62);
-  --g-blur:     blur(28px) saturate(1.15);
-  --g-shadow:   0 4px 40px rgba(80,115,95,0.10), inset 0 1px 0 rgba(255,255,255,0.55);
-  --g-radius:   26px;
-}
+    @font-face {
+      font-family: 'TokytoThin';
+      src: url('fonts/Tokyto-trial-Thin-C copy.otf') format('opentype');
+      font-display: swap;
+    }
 
-html { scroll-behavior: smooth; height: 100%; }
+    @font-face {
+      font-family: 'ortica';
+      src: url('fonts/ortica.otf') format('opentype');
+      font-display: swap;
+    }
 
-body {
-  min-height: 100%;
-  color: var(--text);
-  overflow-x: hidden;
-  cursor: none;
-  /* sage base */
-  background-color: var(--sage);
-}
+    @font-face {
+      font-family: 'Parasitype';
+      src: url('fonts/Parasitype.otf') format('opentype');
+      font-display: swap;
+    }
 
-/* ══════════════════════════
-   FIXED BACKGROUND SCENE
-══════════════════════════ */
-.bg-scene {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-}
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-/* soft radial gradient — matches poster palette */
-.bg-scene::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 90% 70% at 25% 20%, #b8ccbc 0%, transparent 60%),
-    radial-gradient(ellipse 60% 80% at 80% 75%, #c4d2be 0%, transparent 55%),
-    radial-gradient(ellipse 50% 50% at 55% 55%, #d0dcca 0%, transparent 50%),
-    var(--sage);
-}
+    .fixed-sidebar {
+      position: fixed;
+      right: 0.5rem;
+      /* Distance from the right edge */
+      top: 50%;
+      /* Start at the middle of the screen */
+      transform: translateY(-50%);
+      /* Perfectly center it vertically */
+      z-index: 100;
+      /* Ensure it stays on top of other content */
+      pointer-events: none;
+      /* Allows clicks to pass through to content behind it */
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
 
-/* the colony image — barely there, shows through glass */
-.bg-scene::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: url('images/aaa.png') 52% 48% / 62% auto no-repeat;
-  opacity: 0.11;
-  mix-blend-mode: multiply;
-}
+    .fixed-sidebar img {
+      width: 70px;
+      /* Adjust the width to whatever size looks best */
+      height: auto;
+      display: block;
+    }
 
-/* ── NOISE ── */
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 9998;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-  pointer-events: none;
-}
+    :root {
+      --sage: #474c43;
+      --sage-mid: #b8c8b2;
+      --mint: #aac4b8;
+      --mint-deep: #7aa898;
+      --mint-pale: #c8dbd4;
+      --cream: #f0ede4;
+      --text: #3a4a42;
+      --text-mid: #6a7e74;
+      --text-dim: #9aada4;
+      --g-bg: rgba(210, 225, 212, 0.48);
+      --g-border: rgba(255, 255, 255, 0.62);
+      --g-blur: blur(28px) saturate(1.15);
+      --g-shadow: 0 4px 40px rgba(80, 115, 95, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.55);
+      --g-radius: 26px;
+    }
 
-/* ══════════════════════════
-   PAGE CONTENT WRAPPER
-══════════════════════════ */
-.page {
-  position: relative;
-  z-index: 1;
-}
+    html {
+      scroll-behavior: smooth;
+      height: 100%;
+    }
 
-/* ══════════════════════════
-   GLASS PANEL — base class
-══════════════════════════ */
-.glass {
-  background: var(--g-bg);
-  backdrop-filter: var(--g-blur);
-  -webkit-backdrop-filter: var(--g-blur);
-  border: 1px solid var(--g-border);
-  border-radius: var(--g-radius);
-  box-shadow: var(--g-shadow);
-}
+    body {
+      min-height: 100%;
+      color: var(--text);
+      overflow-x: hidden;
+      cursor: none;
+      background-color: var(--sage);
+    }
 
-/* ── PILL ── */
-.pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(232,238,224,0.75);
-  border: 1px solid rgba(255,255,255,0.72);
-  border-radius: 100px;
-  padding: 0.35rem 1rem;
-  font-family: 'ants', sans-serif;
-  font-size: 0.58rem;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  color: var(--text-mid);
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.07), 0 1px 0 rgba(255,255,255,0.65);
-  transition: background 0.25s, color 0.25s, transform 0.2s;
-  backdrop-filter: blur(8px);
-}
-.pill:hover { background: var(--text); color: var(--cream); transform: translateY(-2px); }
 
-/* ══════════════════════════
-   CUSTOM CURSOR
-══════════════════════════ */
-.cursor {
-  position: fixed;
-  z-index: 10000;
-  pointer-events: none;
-  top: 0; left: 0;
-  transform: translate(-50%,-50%);
-  mix-blend-mode: multiply;
-}
-.cursor-dot {
-  width: 8px; height: 8px;
-  background: var(--text);
-  border-radius: 50%;
-  transition: width .25s, height .25s;
-}
-.cursor-ring {
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%,-50%);
-  width: 30px; height: 30px;
-  border: 1px solid var(--text);
-  border-radius: 50%;
-  opacity: 0.32;
-  transition: width .35s cubic-bezier(.4,0,.2,1), height .35s cubic-bezier(.4,0,.2,1), opacity .25s;
-}
-.cursor-label {
-  position: absolute;
-  top: 50%; left: 22px;
-  transform: translateY(-50%);
-  font-family: 'ants', sans-serif;
-  font-size: 0.46rem;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--text-mid);
-  white-space: nowrap;
-  opacity: 0;
-  transition: opacity .2s;
-}
-body.cur-active .cursor-label { opacity: 1; }
-body.cur-hover .cursor-ring   { width: 52px; height: 52px; opacity: 0.18; }
-body.cur-hover .cursor-dot    { width: 4px; height: 4px; }
 
-/* ══════════════════════════
-   DEPTH RAIL
-══════════════════════════ */
-.depth-rail {
-  position: fixed;
-  right: 1.4rem;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 200;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.75rem;
-  pointer-events: none;
-}
-.depth-rail-label {
-  font-family: 'ants', sans-serif;
-  font-size: 0.42rem;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--text-dim);
-  opacity: 0.4;
-  transition: opacity .3s, color .3s;
-  writing-mode: vertical-rl;
-  pointer-events: auto;
-  cursor: none;
-}
-.depth-rail-label.active { color: var(--mint-deep); opacity: 1; }
+    .bg-scene {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
 
-/* ══════════════════════════
-   SCROLL REVEALS
-══════════════════════════ */
-.reveal {
-  opacity: 0;
-  transform: translateY(24px);
-  transition: opacity .7s ease, transform .7s ease;
-}
-.reveal.visible { opacity: 1; transform: translateY(0); }
-.reveal-delay-1 { transition-delay: .1s; }
-.reveal-delay-2 { transition-delay: .22s; }
-.reveal-delay-3 { transition-delay: .36s; }
+    .bg-scene::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 90% 70% at 25% 20%, #b8ccbc 0%, transparent 60%),
+        radial-gradient(ellipse 60% 80% at 80% 75%, #c4d2be 0%, transparent 55%),
+        radial-gradient(ellipse 50% 50% at 55% 55%, #d0dcca 0%, transparent 50%),
+        var(--sage);
+    }
 
-/* ══════════════════════════
-   EYEBROW TICKER
-══════════════════════════ */
-.eyebrow-wrap {
-  background: #000;
-  overflow: hidden;
-  white-space: nowrap;
-  padding: 12px 0;
-  position: relative;
-  z-index: 10;
-}
-.hero-eyebrow {
-  font-family: 'ants', sans-serif;
-  display: inline-block;
-  font-size: 1.8rem;
-  color: white;
-  padding-left: 100%;
-  animation: tickerScroll 28s linear infinite;
-}
-@keyframes tickerScroll { 0%{transform:translateX(0)} 100%{transform:translateX(-100%)} }
+    .bg-scene::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      /* background: url('images/aaa.png') 52% 48% / 62% auto no-repeat; */
+      /* Comment this out */
+      opacity: 0.11;
+      mix-blend-mode: multiply;
+      display: none;
+      /* Add this to hide the static layer */
+    }
 
-/* ══════════════════════════
-   HERO
-══════════════════════════ */
-.hero {
-  min-height: 100vh;
-  padding: 4rem 3rem 5rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 3.5rem;
-}
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 9998;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+    }
 
-.hero-title { display:flex; justify-content:center; }
-.hero-title img { width: 90vw; max-width: 1200px; }
+    .page {
+      position: relative;
+      z-index: 1;
+    }
 
-/* hero info sits inside a glass panel */
-.hero-glass {
-  padding: 3rem 3.5rem;
-  display: grid;
-  grid-template-columns: 1fr 1.4fr;
-  gap: 5rem;
-  align-items: start;
-}
+    .glass {
+      background: var(--g-bg);
+      backdrop-filter: var(--g-blur);
+      -webkit-backdrop-filter: var(--g-blur);
+      border: 1px solid var(--g-border);
+      border-radius: var(--g-radius);
+      box-shadow: var(--g-shadow);
+    }
 
-.hero-sub {
-  font-family: 'ortica', serif;
-  font-size: 0.75rem;
-  line-height: 2.1;
-  color: var(--text-mid);
-}
-.hero-meta { display:flex; flex-direction:column; gap:2.2rem; }
-.hero-pills { display:flex; gap:.5rem; flex-wrap:wrap; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(232, 238, 224, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.72);
+      border-radius: 100px;
+      padding: 0.35rem 1rem;
+      font-family: 'ants', sans-serif;
+      font-size: 0.58rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--text-mid);
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.07), 0 1px 0 rgba(255, 255, 255, 0.65);
+      transition: background 0.25s, color 0.25s, transform 0.2s;
+      backdrop-filter: blur(8px);
+    }
 
-/* depth bars */
-.depth-bars { display:flex; flex-direction:column; gap:.8rem; }
-.dbar-row { display:flex; align-items:center; gap:1rem; }
-.dbar-name {
-  font-family: 'ants', sans-serif;
-  font-size: .52rem; letter-spacing:.18em; text-transform:uppercase;
-  color: var(--text-dim); width:130px; flex-shrink:0;
-}
-.dbar-track { flex:1; height:1px; background:rgba(100,140,120,.2); position:relative; }
-.dbar-fill {
-  position:absolute; top:0; left:0; height:100%;
-  background: var(--mint-deep); opacity:0; width:0;
-  transition: opacity 1.2s ease, width 1.4s cubic-bezier(.4,0,.2,1);
-}
-.dbar-fill.loaded { opacity:.55; }
-.dbar-val { font-family:'ants',sans-serif; font-size:.5rem; letter-spacing:.12em; color:var(--text-dim); width:55px; text-align:right; }
+    .pill:hover {
+      background: var(--text);
+      color: var(--cream);
+      transform: translateY(-2px);
+    }
 
-/* ══════════════════════════
-   SECTION WRAPPER — glass float
-══════════════════════════ */
-.section-wrap {
-  padding: 0 2rem 3rem;
-}
-/* full-bleed variant (ticker, interlude, dark quote) */
-.section-wrap.full { padding: 0 0 3rem; }
+    .depth-rail {
+      position: fixed;
+      right: 1.4rem;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.75rem;
+      pointer-events: none;
+    }
 
-/* ══════════════════════════
-   COMMANDMENTS
-══════════════════════════ */
-.commandments-panel {
-  padding: 5rem 5vw 4rem;
-}
+    .depth-rail-label {
+      font-family: 'ants', sans-serif;
+      font-size: 0.42rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      opacity: 0.4;
+      transition: opacity .3s, color .3s;
+      writing-mode: vertical-rl;
+      pointer-events: auto;
+      cursor: none;
+    }
 
-.cmd-head {
-  display: grid;
-  grid-template-columns: 1fr 1.8fr;
-  gap: 5rem;
-  align-items: end;
-  margin-bottom: 5rem;
-}
-.cmd-title {
-  font-family: 'TokytoC', sans-serif;
-  font-size: clamp(2.8rem,5.5vw,5rem);
-  line-height: 1;
-  color: var(--text);
-}
-.cmd-intro {
-  font-family: 'ortica', serif;
-  font-size: .74rem; line-height:2.1; color:var(--text-mid);
-  padding-bottom:2rem;
-  border-bottom:1px solid rgba(100,140,120,.12);
-}
-.cmd-list { width:100%; }
-.cmd-item {
-  display:grid;
-  grid-template-columns: 100px 1fr;
-  gap:0;
-  padding:3rem 0;
-  border-bottom:1px solid rgba(100,140,120,.1);
-  position:relative; overflow:hidden; cursor:none;
-}
-.cmd-item:first-child { border-top:1px solid rgba(100,140,120,.1); }
-.cmd-item::before {
-  content:'';
-  position:absolute; left:0; top:0; bottom:0; width:0;
-  background:rgba(122,168,152,.1);
-  transition:width .5s cubic-bezier(.4,0,.2,1);
-  z-index:0;
-}
-.cmd-item:hover::before { width:100%; }
-.cmd-num {
-  font-family:'ants',sans-serif; font-size:.52rem; letter-spacing:.28em;
-  text-transform:uppercase; color:var(--text-dim);
-  position:relative; z-index:1;
-  transition:color .3s; padding-top:.3rem;
-}
-.cmd-item:hover .cmd-num { color:var(--mint-deep); }
-.cmd-content { position:relative; z-index:1; padding-right:2rem; }
-.cmd-text {
-  font-family:'ortica',serif;
-  font-size:clamp(1rem,1.8vw,1.4rem); line-height:1.55; color:var(--text);
-}
-.cmd-sub {
-  display:block; font-family:'ants',sans-serif;
-  font-size:.63rem; line-height:1.9; color:var(--text-mid);
-  margin-top:.8rem;
-  max-height:0; overflow:hidden; opacity:0;
-  transition:max-height .5s ease, opacity .4s ease;
-}
-.cmd-item:hover .cmd-sub { max-height:80px; opacity:1; }
+    .depth-rail-label.active {
+      color: var(--mint-deep);
+      opacity: 1;
+    }
 
-/* ══════════════════════════
-   QUOTE 1
-══════════════════════════ */
-.quote-1-panel {
-  padding: 5rem 5vw;
-  display: grid;
-  grid-template-columns: 110px 1fr;
-  gap: 4rem;
-  align-items: center;
-}
-.q1-aside { display:flex; flex-direction:column; gap:1rem; }
-.q1-num {
-  font-family:'TokytoThin','TokytoC',sans-serif;
-  font-size:5rem; color:rgba(100,160,130,.12); line-height:1;
-}
-.q1-label {
-  font-family:'ants',sans-serif; font-size:.52rem; letter-spacing:.3em;
-  text-transform:uppercase; color:var(--text-dim);
-  writing-mode:vertical-rl; transform:rotate(180deg);
-}
-.q1-text {
-  font-family:'ortica',serif; font-style:italic;
-  font-size:clamp(1.5rem,2.8vw,2.4rem); line-height:1.55; color:var(--text);
-}
-.q1-attr {
-  font-family:'ants',sans-serif; font-size:.54rem; letter-spacing:.24em;
-  text-transform:uppercase; color:var(--text-dim);
-  margin-top:2rem; padding-top:1.5rem;
-  border-top:1px solid rgba(100,140,120,.12);
-}
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity .7s ease, transform .7s ease;
+    }
 
-/* ══════════════════════════
-   MAP
-══════════════════════════ */
-.map-panel { padding: 4rem 4vw 3.5rem; }
-.map-header { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:2.5rem; }
-.map-title-group { display:flex; flex-direction:column; gap:1rem; }
-.map-title { font-family:'TokytoC',sans-serif; font-size:clamp(2rem,4vw,3.2rem); color:var(--text); }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
 
-.map-img-wrap {
-  border-radius: 18px;
-  overflow: hidden;
-  border: 1px solid rgba(255,255,255,.5);
-  background: rgba(180,200,188,.25);
-}
-.map-img-wrap img { width:100%; display:block; mix-blend-mode:multiply; }
+    .reveal-delay-1 {
+      transition-delay: .1s;
+    }
 
-.stats-band { display:grid; grid-template-columns:repeat(3,1fr); margin-top:1.2rem; gap:1rem; }
-.stat-card {
-  background: rgba(200,220,210,.45);
-  border: 1px solid rgba(255,255,255,.6);
-  border-radius: 16px;
-  padding: 2rem 1.5rem;
-  text-align: center;
-  backdrop-filter: blur(12px);
-  transition: background .3s, transform .3s;
-}
-.stat-card:hover { background:rgba(200,220,210,.75); transform:translateY(-3px); }
-.stat-n { font-family:'TokytoC',sans-serif; font-size:clamp(2rem,5vw,3.2rem); color:var(--mint-deep); line-height:1; margin-bottom:.5rem; }
-.stat-l { font-family:'ants',sans-serif; font-size:.54rem; letter-spacing:.3em; text-transform:uppercase; color:var(--text-dim); }
+    .reveal-delay-2 {
+      transition-delay: .22s;
+    }
 
-/* ══════════════════════════
-   STRATA
-══════════════════════════ */
-.strata-panel { padding: 5rem 4vw; }
-.strata-header { display:grid; grid-template-columns:1fr 1fr; gap:4rem; margin-bottom:4rem; align-items:end; }
-.strata-title { font-family:'TokytoC',sans-serif; font-size:clamp(2.5rem,5vw,4.5rem); color:var(--text); line-height:1.05; }
-.strata-intro { font-family:'ortica',serif; font-size:.73rem; line-height:2.1; color:var(--text-mid); }
+    .reveal-delay-3 {
+      transition-delay: .36s;
+    }
 
-.strata-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; }
-.strata-card {
-  background: rgba(200,220,210,.38);
-  border: 1px solid rgba(255,255,255,.6);
-  border-radius: 18px;
-  padding: 2.5rem 1.8rem;
-  position: relative;
-  overflow: hidden;
-  cursor: none;
-  min-height: 280px;
-  backdrop-filter: blur(10px);
-  transition: background .3s;
-}
-.strata-card:hover { background:rgba(200,220,210,.6); }
+    .eyebrow-wrap {
+      background: #000;
+      overflow: hidden;
+      white-space: nowrap;
+      padding: 12px 0;
+      position: relative;
+      z-index: 10;
+    }
 
-.strata-overlay {
-  position:absolute; inset:0;
-  background: rgba(45,60,52,0.92);
-  backdrop-filter: blur(4px);
-  border-radius: 18px;
-  padding: 2.5rem 1.8rem;
-  display:flex; flex-direction:column; justify-content:flex-end;
-  transform: translateY(100%);
-  transition: transform .45s cubic-bezier(.4,0,.2,1);
-}
-.strata-card:hover .strata-overlay { transform:translateY(0); }
+    .hero-eyebrow {
+      font-family: 'ants', sans-serif;
+      display: inline-block;
+      font-size: 1.8rem;
+      color: white;
+      padding-left: 100%;
+      animation: tickerScroll 28s linear infinite;
+    }
 
-.strata-overlay-num {
-  font-family:'TokytoThin','TokytoC',sans-serif; font-size:6rem;
-  color:rgba(255,255,255,.05); line-height:1;
-  position:absolute; top:.5rem; right:.8rem;
-}
-.strata-overlay-depth { font-family:'ants',sans-serif; font-size:.52rem; letter-spacing:.3em; text-transform:uppercase; color:var(--mint-pale); opacity:.55; margin-bottom:1rem; }
-.strata-overlay-name { font-family:'ortica',serif; font-size:1.5rem; color:var(--cream); line-height:1.15; margin-bottom:1.2rem; }
-.strata-overlay-desc { font-family:'ants',sans-serif; font-size:.63rem; line-height:1.9; color:var(--mint-pale); opacity:.7; }
+    @keyframes tickerScroll {
+      0% {
+        transform: translateX(0)
+      }
 
-.strata-card-inner { position:relative; z-index:1; height:100%; }
-.strata-card-num { font-family:'TokytoC',sans-serif; font-size:4rem; color:rgba(100,160,130,.1); line-height:1; position:absolute; top:0; right:0; }
-.strata-depth { font-family:'ants',sans-serif; font-size:.54rem; letter-spacing:.28em; text-transform:uppercase; color:var(--text-dim); margin-bottom:1.2rem; display:flex; align-items:center; gap:.5rem; }
-.depth-pip { width:5px; height:5px; border-radius:50%; background:var(--mint-deep); opacity:.5; }
-.strata-name { font-family:'ortica',serif; font-size:1.2rem; color:var(--text); margin-bottom:1rem; line-height:1.2; }
-.strata-desc { font-family:'ants',sans-serif; font-size:.65rem; line-height:1.9; color:var(--text-mid); }
+      100% {
+        transform: translateX(-100%)
+      }
+    }
 
-/* ══════════════════════════
-   INTERLUDE
-══════════════════════════ */
-.interlude { overflow:hidden; padding:4rem 0; }
-.interlude-wrap { display:flex; width:max-content; }
-.interlude-text {
-  font-family:'TokytoThin','TokytoC',sans-serif;
-  font-size:clamp(5rem,13vw,13rem);
-  color:rgba(58,74,66,.07); white-space:nowrap; line-height:1;
-  display:block;
-  animation:interlude-scroll 18s linear infinite;
-}
-@keyframes interlude-scroll { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+    .hero {
+      min-height: 100vh;
+      padding: 4rem 3rem 5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 3.5rem;
+    }
 
-/* ══════════════════════════
-   ROLES
-══════════════════════════ */
-.roles-panel { padding: 5rem 4vw; }
-.roles-header { display:grid; grid-template-columns:1fr 1fr; gap:4rem; margin-bottom:4rem; align-items:end; }
-.roles-title { font-family:'TokytoC',sans-serif; font-size:clamp(2.5rem,5vw,4.5rem); color:var(--text); line-height:1.05; }
-.roles-intro { font-family:'ortica',serif; font-size:.73rem; line-height:2.1; color:var(--text-mid); }
+    .hero-title {
+      display: flex;
+      justify-content: center;
+    }
 
-.roles-grid { display:grid; grid-template-columns:repeat(4,1fr); }
-.role-card {
-  border:1px solid rgba(255,255,255,.58);
-  border-right:none;
-  padding:3rem 2rem;
-  position:relative; overflow:hidden; cursor:none;
-  background:rgba(200,220,210,.32);
-  backdrop-filter:blur(10px);
-  transition:background .35s;
-}
-.role-card:first-child { border-radius:18px 0 0 18px; }
-.role-card:last-child  { border-right:1px solid rgba(255,255,255,.58); border-radius:0 18px 18px 0; }
-.role-card::before {
-  content:''; position:absolute; inset:0;
-  background:var(--mint);
-  transform:translateX(-101%);
-  transition:transform .5s cubic-bezier(.4,0,.2,1);
-  opacity:.16; z-index:0;
-}
-.role-card:hover::before { transform:translateX(0); }
-.role-card:hover { background:rgba(200,220,210,.6); }
-.role-card > * { position:relative; z-index:1; }
-.role-glyph { font-family:'ants',sans-serif; font-size:3rem; color:var(--mint-deep); opacity:.14; line-height:1; margin-bottom:1.5rem; transition:opacity .3s, font-size .3s; }
-.role-card:hover .role-glyph { opacity:.28; font-size:3.4rem; }
-.role-stratum { font-family:'ants',sans-serif; font-size:.5rem; letter-spacing:.3em; text-transform:uppercase; color:var(--text-dim); margin-bottom:.7rem; }
-.role-name { font-family:'ortica',serif; font-size:1.2rem; color:var(--text); margin-bottom:1rem; line-height:1.2; }
-.role-desc { font-family:'ants',sans-serif; font-size:.63rem; line-height:1.95; color:var(--text-mid); }
-.role-obligation { margin-top:1.5rem; padding-top:1.2rem; border-top:1px solid rgba(100,140,120,.12); font-family:'ants',sans-serif; font-size:.52rem; letter-spacing:.2em; text-transform:uppercase; color:var(--text-dim); }
-.role-obligation span { color:var(--mint-deep); }
+    .hero-title img {
+      width: 90vw;
+      max-width: 1200px;
+    }
 
-/* ══════════════════════════
-   QUOTE 2 (dark glass)
-══════════════════════════ */
-.quote-2-panel {
-  background: rgba(42,56,48,0.88) !important;
-  border-color: rgba(80,110,90,.4) !important;
-  padding: 7rem 7vw;
-  position: relative; overflow:hidden;
-}
-.quote-2-panel::before {
-  content:''; position:absolute; left:-10%; top:-20%; width:60vw; height:60vw;
-  border-radius:50%;
-  background:radial-gradient(circle, rgba(170,196,184,.06) 0%, transparent 70%);
-  pointer-events:none;
-}
-.q2-inner { max-width:900px; margin:0 auto; text-align:center; display:flex; flex-direction:column; align-items:center; gap:2.5rem; }
-.q2-text { font-family:'ortica',serif; font-style:italic; font-size:clamp(1.8rem,4vw,3rem); color:var(--cream); line-height:1.5; }
-.q2-text em { font-style:normal; color:var(--mint-pale); }
-.q2-attr { font-family:'ants',sans-serif; font-size:.56rem; letter-spacing:.3em; text-transform:uppercase; color:rgba(200,219,212,.32); }
-.q2-word { display:inline-block; opacity:0; transform:translateY(12px); transition:opacity .5s ease, transform .5s ease; }
-.q2-word.show { opacity:1; transform:translateY(0); }
+    .hero-glass {
+      padding: 3rem 3.5rem;
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 5rem;
+      align-items: start;
+    }
 
-/* ══════════════════════════
-   FINAL / FORM
-══════════════════════════ */
-.final-panel {
-  padding: 5rem 5vw;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6rem;
-  align-items: start;
-}
-.final-left { display:flex; flex-direction:column; gap:2.5rem; }
-.final-title { font-family:'TokytoC',sans-serif; font-size:clamp(2.5rem,5vw,4rem); line-height:1.05; color:var(--text); }
-.final-title em { font-style:italic; color:var(--mint-deep); font-family:'ortica',serif; }
-.final-body { font-family:'ortica',serif; font-size:.73rem; line-height:2.1; color:var(--text-mid); max-width:380px; }
-.final-note { font-family:'ants',sans-serif; font-size:.52rem; letter-spacing:.22em; text-transform:uppercase; color:var(--text-dim); padding-top:1.5rem; border-top:1px solid rgba(100,140,120,.12); }
+    .hero-sub {
+font-family: "address-sans-pro", sans-serif;
+font-weight: 400;
+font-style: normal;      font-size: 0.75rem;
+      line-height: 2.1;
+      color: var(--text-mid);
+    }
 
-.form-inner { display:flex; flex-direction:column; gap:1.2rem; }
-.form-label { font-family:'ants',sans-serif; font-size:.54rem; letter-spacing:.25em; text-transform:uppercase; color:var(--text-dim); margin-bottom:.4rem; display:block; }
-.form-input {
-  width:100%; background:rgba(255,255,255,.5); border:1px solid rgba(255,255,255,.7);
-  border-radius:10px; padding:.85rem 1rem;
-  font-family:'ants',sans-serif; font-size:.68rem; color:var(--text);
-  outline:none; cursor:none;
-  transition:border .2s, background .2s;
-}
-.form-input::placeholder { color:var(--text-dim); }
-.form-input:focus { border-color:var(--mint-deep); background:rgba(255,255,255,.75); }
-.form-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
-.form-submit {
-  width:100%; background:var(--text); color:var(--cream);
-  font-family:'ants',sans-serif; font-size:.6rem; letter-spacing:.35em; text-transform:uppercase;
-  padding:1rem; border-radius:10px; border:none; cursor:none;
-  transition:background .3s, letter-spacing .3s; margin-top:.5rem;
-}
-.form-submit:hover { background:var(--mint-deep); letter-spacing:.5em; }
+    .hero-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 2.2rem;
+    }
 
-/* ══════════════════════════
-   FOOTER
-══════════════════════════ */
-footer {
-  padding: 2rem 4rem;
-  display:flex; justify-content:space-between; align-items:center;
-  font-family:'ants',sans-serif; font-size:.54rem;
-  letter-spacing:.22em; text-transform:uppercase; color:var(--text-dim);
-}
+    .hero-pills {
+      display: flex;
+      gap: .5rem;
+      flex-wrap: wrap;
+    }
 
-/* ══════════════════════════
-   RESPONSIVE
-══════════════════════════ */
-@media (max-width:900px) {
-  .hero-glass { grid-template-columns:1fr; gap:3rem; }
-  .cmd-head { grid-template-columns:1fr; gap:2rem; }
-  .cmd-item { grid-template-columns:80px 1fr; }
-  .quote-1-panel { grid-template-columns:1fr; gap:2rem; }
-  .q1-num { display:none; }
-  .strata-header, .roles-header { grid-template-columns:1fr; gap:2rem; }
-  .strata-grid { grid-template-columns:repeat(2,1fr); }
-  .roles-grid { grid-template-columns:repeat(2,1fr); }
-  .role-card:nth-child(2) { border-radius:0 18px 0 0; border-right:1px solid rgba(255,255,255,.58); }
-  .role-card:nth-child(3) { border-top:none; border-radius:0 0 0 18px; }
-  .role-card:last-child   { border-top:none; }
-  .final-panel { grid-template-columns:1fr; gap:4rem; }
-  .stats-band  { grid-template-columns:1fr; }
-  .depth-rail  { display:none; }
-  footer       { flex-direction:column; gap:1rem; text-align:center; }
-}
-@media (max-width:550px) {
-  .strata-grid { grid-template-columns:1fr; }
-  .roles-grid  { grid-template-columns:1fr; }
-  .form-row    { grid-template-columns:1fr; }
-  .map-header  { flex-direction:column; align-items:flex-start; gap:1rem; }
-  .section-wrap { padding:0 1rem 2rem; }
-}
-</style>
+    .depth-bars {
+      display: flex;
+      flex-direction: column;
+      gap: .8rem;
+    }
+
+    .dbar-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .dbar-name {
+      font-family: 'ants', sans-serif;
+      font-size: .52rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      width: 130px;
+      flex-shrink: 0;
+    }
+
+    .dbar-track {
+      flex: 1;
+      height: 1px;
+      background: rgba(100, 140, 120, .2);
+      position: relative;
+    }
+
+    .dbar-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      background: var(--mint-deep);
+      opacity: 0;
+      width: 0;
+      transition: opacity 1.2s ease, width 1.4s cubic-bezier(.4, 0, .2, 1);
+    }
+
+    .dbar-fill.loaded {
+      opacity: .55;
+    }
+
+    .dbar-val {
+      font-family: 'ants', sans-serif;
+      font-size: .5rem;
+      letter-spacing: .12em;
+      color: var(--text-dim);
+      width: 55px;
+      text-align: right;
+    }
+
+    .section-wrap {
+      padding: 0 2rem 3rem;
+    }
+
+    .section-wrap.full {
+      padding: 0 0 3rem;
+    }
+
+    .commandments-panel {
+      padding: 5rem 5vw 4rem;
+    }
+
+    .cmd-head {
+      display: grid;
+      grid-template-columns: 1fr 1.8fr;
+      gap: 5rem;
+      align-items: end;
+      margin-bottom: 5rem;
+    }
+
+    .cmd-title {
+      font-family: 'TokytoC', sans-serif;
+      font-size: clamp(2.8rem, 5.5vw, 5rem);
+      line-height: 1;
+      color: var(--text);
+    }
+
+    .cmd-intro {
+      font-family: "address-sans-pro", sans-serif;
+font-weight: 400;
+font-style: normal;
+      font-size: .74rem;
+      line-height: 2.1;
+      color: var(--text-mid);
+      padding-bottom: 2rem;
+      border-bottom: 1px solid rgba(100, 140, 120, .12);
+    }
+
+    .cmd-list {
+      width: 100%;
+    }
+
+    .cmd-item {
+      font-family: "address-sans-pro", sans-serif;
+      font-weight: 400;
+      font-style: normal;
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      gap: 0;
+      padding: 3rem 0;
+      border-bottom: 1px solid rgba(100, 140, 120, .1);
+      position: relative;
+      overflow: hidden;
+      cursor: none;
+    }
+
+    .cmd-item:first-child {
+      border-top: 1px solid rgba(100, 140, 120, .1);
+    }
+
+    .cmd-item::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 0;
+      background: rgba(122, 168, 152, .1);
+      transition: width .5s cubic-bezier(.4, 0, .2, 1);
+      z-index: 0;
+    }
+
+    .cmd-item:hover::before {
+      width: 100%;
+    }
+
+    .cmd-num {
+      font-size: .52rem;
+      letter-spacing: .28em;
+      text-transform: uppercase;
+      color: var(--mint-deep);
+      position: relative;
+      z-index: 1;
+      transition: color .3s;
+      padding-top: .3rem;
+    }
+
+    .cmd-item:hover .cmd-num {
+      color: var(--text);
+    }
+
+    .cmd-content {
+      position: relative;
+      z-index: 1;
+      padding-right: 2rem;
+    }
+
+    .cmd-text {
+font-family: "address-sans-pro", sans-serif;
+font-weight: 300;
+font-style: normal;      
+font-size: clamp(1rem, 1.8vw, 1.4rem);
+      line-height: 1.55;
+      color: var(--text);
+    }
+
+    .cmd-sub {
+      display: block;
+      font-size: .63rem;
+      line-height: 1.9;
+      color: var(--text-mid);
+      margin-top: .8rem;
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height .5s ease, opacity .4s ease;
+    }
+
+    .cmd-item:hover .cmd-sub {
+      max-height: 80px;
+      opacity: 1;
+    }
+
+    .quote-1-panel {
+      padding: 5rem 5vw;
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+
+    .q1-aside {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .q1-num {
+      font-family: 'TokytoThin', 'TokytoC', sans-serif;
+      font-size: 5rem;
+      color: black;
+      line-height: 1;
+    }
+
+    .q1-label {
+      font-family: 'ants', sans-serif;
+      font-size: .52rem;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--text);
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+    }
+
+    .q1-text {
+      font-family: 'ortica', serif;
+      font-style: italic;
+      font-size: clamp(1.5rem, 2.8vw, 2.4rem);
+      line-height: 1.55;
+      color: var(--text);
+    }
+
+    .q1-attr {
+      font-family: 'ants', sans-serif;
+      font-size: .54rem;
+      letter-spacing: .24em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(100, 140, 120, .12);
+    }
+
+    .map-panel {
+      padding: 4rem 4vw 3.5rem;
+    }
+
+    .map-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 2.5rem;
+    }
+
+    .map-title-group {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .map-title {
+      font-family: 'TokytoC', sans-serif;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      color: var(--text);
+    }
+
+    .map-img-wrap {
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, .5);
+      background: rgba(180, 200, 188, .25);
+    }
+
+    .map-img-wrap img {
+      width: 100%;
+      display: block;
+      mix-blend-mode: multiply;
+    }
+
+    .stats-band {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      margin-top: 1.2rem;
+      gap: 1rem;
+    }
+
+    .stat-card {
+      background: rgba(200, 220, 210, .45);
+      border: 1px solid rgba(255, 255, 255, .6);
+      border-radius: 16px;
+      padding: 2rem 1.5rem;
+      text-align: center;
+      backdrop-filter: blur(12px);
+      transition: background .3s, transform .3s;
+    }
+
+    .stat-card:hover {
+      background: rgba(200, 220, 210, .75);
+      transform: translateY(-3px);
+    }
+
+    .stat-n {
+      font-family: 'TokytoC', sans-serif;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      color: var(--mint-deep);
+      line-height: 1;
+      margin-bottom: .5rem;
+    }
+
+    .stat-l {
+      font-family: 'ants', sans-serif;
+      font-size: .54rem;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    .strata-panel {
+      padding: 5rem 4vw;
+    }
+
+    .strata-header {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      margin-bottom: 4rem;
+      align-items: end;
+    }
+
+    .strata-title {
+      font-family: 'TokytoC', sans-serif;
+      font-size: clamp(2.5rem, 5vw, 4.5rem);
+      color: var(--text);
+      line-height: 1.05;
+    }
+
+    .strata-intro {
+      font-family: 'ortica', serif;
+      font-size: .73rem;
+      line-height: 2.1;
+      color: var(--text-mid);
+    }
+
+    .strata-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+    }
+
+    .strata-card {
+      background: rgba(200, 220, 210, .38);
+      border: 1px solid rgba(255, 255, 255, .6);
+      border-radius: 18px;
+      padding: 2.5rem 1.8rem;
+      position: relative;
+      overflow: hidden;
+      cursor: none;
+      min-height: 280px;
+      backdrop-filter: blur(10px);
+      transition: background .3s;
+    }
+
+    .strata-card:hover {
+      background: rgba(200, 220, 210, .6);
+    }
+
+    .strata-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(45, 60, 52, 0.92);
+      backdrop-filter: blur(4px);
+      border-radius: 18px;
+      padding: 2.5rem 1.8rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      transform: translateY(100%);
+      transition: transform .45s cubic-bezier(.4, 0, .2, 1);
+    }
+
+    .strata-card:hover .strata-overlay {
+      transform: translateY(0);
+    }
+
+    .strata-overlay-num {
+      font-family: 'TokytoThin', 'TokytoC', sans-serif;
+      font-size: 6rem;
+      color: rgba(255, 255, 255, .05);
+      line-height: 1;
+      position: absolute;
+      top: .5rem;
+      right: .8rem;
+    }
+
+    .strata-overlay-depth {
+      font-family: 'ants', sans-serif;
+      font-size: .52rem;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--mint-pale);
+      opacity: .55;
+      margin-bottom: 1rem;
+    }
+
+    .strata-overlay-name {
+      font-family: 'ortica', serif;
+      font-size: 1.5rem;
+      color: var(--cream);
+      line-height: 1.15;
+      margin-bottom: 1.2rem;
+    }
+
+    .strata-overlay-desc {
+      font-family: 'ants', sans-serif;
+      font-size: .63rem;
+      line-height: 1.9;
+      color: var(--mint-pale);
+      opacity: .7;
+    }
+
+    .strata-card-inner {
+      position: relative;
+      z-index: 1;
+      height: 100%;
+    }
+
+    .strata-card-num {
+      font-family: 'TokytoC', sans-serif;
+      font-size: 4rem;
+      color: rgba(100, 160, 130, .1);
+      line-height: 1;
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
+
+    .strata-depth {
+      font-family: 'ants', sans-serif;
+      font-size: .54rem;
+      letter-spacing: .28em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+
+    .depth-pip {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--mint-deep);
+      opacity: .5;
+    }
+
+    .strata-name {
+      font-family: 'ortica', serif;
+      font-size: 1.2rem;
+      color: var(--text);
+      margin-bottom: 1rem;
+      line-height: 1.2;
+    }
+
+    .strata-desc {
+      font-family: 'ants', sans-serif;
+      font-size: .65rem;
+      line-height: 1.9;
+      color: var(--text-mid);
+    }
+
+    .interlude {
+      overflow: hidden;
+      padding: 4rem 0;
+    }
+
+    .interlude-wrap {
+      display: flex;
+      width: max-content;
+    }
+
+    .interlude-text {
+      font-family: 'TokytoThin', 'TokytoC', sans-serif;
+      font-size: clamp(5rem, 13vw, 13rem);
+      color: black;
+      white-space: nowrap;
+      line-height: 1.2;
+      display: block;
+      animation: interlude-scroll 18s linear infinite;
+    }
+
+    @keyframes interlude-scroll {
+      from {
+        transform: translateX(0)
+      }
+
+      to {
+        transform: translateX(-50%)
+      }
+    }
+
+    .roles-panel {
+      padding: 5rem 4vw;
+    }
+
+    .roles-header {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      margin-bottom: 4rem;
+      align-items: end;
+    }
+
+    .roles-title {
+      font-family: 'TokytoC', sans-serif;
+      font-size: clamp(2.5rem, 5vw, 4.5rem);
+      color: var(--text);
+      line-height: 1.05;
+    }
+
+    .roles-intro {
+      font-family: 'ortica', serif;
+      font-size: .73rem;
+      line-height: 2.1;
+      color: var(--text-mid);
+    }
+
+    .roles-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .role-card {
+      border: 1px solid rgba(255, 255, 255, .58);
+      border-right: none;
+      padding: 3rem 2rem;
+      position: relative;
+      overflow: hidden;
+      cursor: none;
+      background: rgba(200, 220, 210, .32);
+      backdrop-filter: blur(10px);
+      transition: background .35s;
+    }
+
+    .role-card:first-child {
+      border-radius: 18px 0 0 18px;
+    }
+
+    .role-card:last-child {
+      border-right: 1px solid rgba(255, 255, 255, .58);
+      border-radius: 0 18px 18px 0;
+    }
+
+    .role-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--mint);
+      transform: translateX(-101%);
+      transition: transform .5s cubic-bezier(.4, 0, .2, 1);
+      opacity: .16;
+      z-index: 0;
+    }
+
+    .role-card:hover::before {
+      transform: translateX(0);
+    }
+
+    .role-card:hover {
+      background: rgba(200, 220, 210, .6);
+    }
+
+    .role-card>* {
+      position: relative;
+      z-index: 1;
+    }
+
+    .role-glyph {
+      font-family: 'ants', sans-serif;
+      font-size: 3rem;
+      color: var(--mint-deep);
+      opacity: .14;
+      line-height: 1;
+      margin-bottom: 1.5rem;
+      transition: opacity .3s, font-size .3s;
+    }
+
+    .role-card:hover .role-glyph {
+      opacity: .28;
+      font-size: 3.4rem;
+    }
+
+    .role-stratum {
+      font-family: 'ants', sans-serif;
+      font-size: .5rem;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: .7rem;
+    }
+
+    .role-name {
+      font-family: 'ortica', serif;
+      font-size: 1.2rem;
+      color: var(--text);
+      margin-bottom: 1rem;
+      line-height: 1.2;
+    }
+
+    .role-desc {
+      font-family: 'ants', sans-serif;
+      font-size: .63rem;
+      line-height: 1.95;
+      color: var(--text-mid);
+    }
+
+    .role-obligation {
+      margin-top: 1.5rem;
+      padding-top: 1.2rem;
+      border-top: 1px solid rgba(100, 140, 120, .12);
+      font-family: 'ants', sans-serif;
+      font-size: .52rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    .role-obligation span {
+      color: var(--mint-deep);
+    }
+
+    .quote-2-panel {
+      background: rgba(42, 56, 48, 0.88) !important;
+      border-color: rgba(80, 110, 90, .4) !important;
+      padding: 7rem 7vw;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .quote-2-panel::before {
+      content: '';
+      position: absolute;
+      left: -10%;
+      top: -20%;
+      width: 60vw;
+      height: 60vw;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(170, 196, 184, .06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .q2-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2.5rem;
+    }
+
+    .q2-text {
+      font-family: 'ortica', serif;
+      font-style: italic;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      color: var(--cream);
+      line-height: 1.5;
+    }
+
+    .q2-text em {
+      font-style: normal;
+      color: var(--mint-pale);
+    }
+
+    .q2-attr {
+      font-family: 'ants', sans-serif;
+      font-size: .56rem;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: rgba(200, 219, 212, .32);
+    }
+
+    .q2-word {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity .5s ease, transform .5s ease;
+    }
+
+    .q2-word.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .final-panel {
+      padding: 5rem 5vw;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem;
+      align-items: start;
+    }
+
+    .final-left {
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
+    }
+
+    .final-title {
+      font-family: 'TokytoC', sans-serif;
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      line-height: 1.05;
+      color: var(--text);
+    }
+
+    .final-title em {
+      font-style: italic;
+      color: var(--mint-deep);
+      font-family: 'ortica', serif;
+    }
+
+    .final-body {
+      font-family: 'ortica', serif;
+      font-size: .73rem;
+      line-height: 2.1;
+      color: var(--text-mid);
+      max-width: 380px;
+    }
+
+    .final-note {
+      font-family: 'ants', sans-serif;
+      font-size: .52rem;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(100, 140, 120, .12);
+    }
+
+    .form-inner {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    .form-label {
+      font-family: 'ants', sans-serif;
+      font-size: .54rem;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: .4rem;
+      display: block;
+    }
+
+    .form-input {
+      width: 100%;
+      background: rgba(255, 255, 255, .5);
+      border: 1px solid rgba(255, 255, 255, .7);
+      border-radius: 10px;
+      padding: .85rem 1rem;
+      font-family: 'ants', sans-serif;
+      font-size: .68rem;
+      color: var(--text);
+      outline: none;
+      cursor: none;
+      transition: border .2s, background .2s;
+    }
+
+    .form-input::placeholder {
+      color: var(--text-dim);
+    }
+
+    .form-input:focus {
+      border-color: var(--mint-deep);
+      background: rgba(255, 255, 255, .75);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .form-submit {
+      width: 100%;
+      background: var(--text);
+      color: var(--cream);
+      font-family: 'ants', sans-serif;
+      font-size: .6rem;
+      letter-spacing: .35em;
+      text-transform: uppercase;
+      padding: 1rem;
+      border-radius: 10px;
+      border: none;
+      cursor: none;
+      transition: background .3s, letter-spacing .3s;
+      margin-top: .5rem;
+    }
+
+    .form-submit:hover {
+      background: var(--mint-deep);
+      letter-spacing: .5em;
+    }
+
+    footer {
+      padding: 2rem 4rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'ants', sans-serif;
+      font-size: .54rem;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    /* ── CANVAS BACKGROUND ── */
+    #bg-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: -3;
+      pointer-events: none;
+      width: 100%;
+      height: 100%;
+    }
+
+
+
+    @media (max-width:900px) {
+      .hero-glass {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+      }
+
+      .cmd-head {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      .cmd-item {
+        grid-template-columns: 80px 1fr;
+      }
+
+      .quote-1-panel {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      .q1-num {
+        display: none;
+      }
+
+      .strata-header,
+      .roles-header {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      .strata-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .roles-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .role-card:nth-child(2) {
+        border-radius: 0 18px 0 0;
+        border-right: 1px solid rgba(255, 255, 255, .58);
+      }
+
+      .role-card:nth-child(3) {
+        border-top: none;
+        border-radius: 0 0 0 18px;
+      }
+
+      .role-card:last-child {
+        border-top: none;
+      }
+
+      .final-panel {
+        grid-template-columns: 1fr;
+        gap: 4rem;
+      }
+
+      .stats-band {
+        grid-template-columns: 1fr;
+      }
+
+      .depth-rail {
+        display: none;
+      }
+
+      footer {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+      }
+    }
+
+    @media (max-width:550px) {
+      .strata-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .roles-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .map-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+
+      .section-wrap {
+        padding: 0 1rem 2rem;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-<!-- background scene (fixed) -->
-<div class="bg-scene" aria-hidden="true"></div>
+  <div class="bg-scene" aria-hidden="true"></div>
 
-<!-- cursor -->
-<div class="cursor" id="cursor">
-  <div class="cursor-dot"  id="cursor-dot"></div>
-  <div class="cursor-ring" id="cursor-ring"></div>
-  <div class="cursor-label" id="cursor-label"></div>
-</div>
+  <nav class="depth-rail" id="depth-rail">
+    <span class="depth-rail-label active" data-target="hero">surface</span>
+    <span class="depth-rail-label" data-target="commandments">code</span>
+    <span class="depth-rail-label" data-target="map">map</span>
+    <span class="depth-rail-label" data-target="strata">strata</span>
+    <span class="depth-rail-label" data-target="roles">roles</span>
+    <span class="depth-rail-label" data-target="final">descent</span>
+  </nav>
 
-<!-- depth rail -->
-<nav class="depth-rail" id="depth-rail">
-  <span class="depth-rail-label active" data-target="hero">surface</span>
-  <span class="depth-rail-label" data-target="commandments">code</span>
-  <span class="depth-rail-label" data-target="map">map</span>
-  <span class="depth-rail-label" data-target="strata">strata</span>
-  <span class="depth-rail-label" data-target="roles">roles</span>
-  <span class="depth-rail-label" data-target="final">descent</span>
-</nav>
+  <div class="page">
 
-<div class="page">
-
-  <!-- EYEBROW -->
-  <div class="eyebrow-wrap">
-    <span class="hero-eyebrow">Loneliness is a surface world condition. We are the cure. &nbsp;·&nbsp; Substrata Colony · Est. Year Zero &nbsp;·&nbsp; 58m · 4 Strata · 12,000 Residents &nbsp;·&nbsp; All depths. All functions. &nbsp;·&nbsp; </span>
-  </div>
-
-  <!-- HERO -->
-  <section class="hero" id="hero">
-    <h1 class="hero-title reveal">
-      <img src="names/substrata.png" alt="Substrata">
-    </h1>
-
-    <div class="glass hero-glass reveal reveal-delay-1">
-      <p class="hero-sub">Substrata was not built — it was excavated.<br><br>
-      Chamber by chamber, passage by passage, its founders carved meaning from earth and stone, studying systems that had long existed beneath notice: ant colonies, their density, their persistence, the way they appear precisely when absence feels most complete.<br><br>
-      What emerged was not merely shelter, but a system. A living geometry of mutual purpose. Every resident is both cell and organism. Every corridor connects.</p>
-
-      <div class="hero-meta">
-        <div class="hero-pills">
-          <span class="pill" data-cursor="4 strata">4 Strata</span>
-          <span class="pill" data-cursor="58 metres">58m Depth</span>
-          <span class="pill" data-cursor="12,000 souls">12,000 Residents</span>
-        </div>
-        <div class="depth-bars" id="depth-bars">
-          <div class="dbar-row">
-            <span class="dbar-name">I · Threshold</span>
-            <div class="dbar-track"><div class="dbar-fill" data-w="21"></div></div>
-            <span class="dbar-val">0–12m</span>
-          </div>
-          <div class="dbar-row">
-            <span class="dbar-name">II · Working Belt</span>
-            <div class="dbar-track"><div class="dbar-fill" data-w="48"></div></div>
-            <span class="dbar-val">12–28m</span>
-          </div>
-          <div class="dbar-row">
-            <span class="dbar-name">III · Inner Ring</span>
-            <div class="dbar-track"><div class="dbar-fill" data-w="76"></div></div>
-            <span class="dbar-val">28–44m</span>
-          </div>
-          <div class="dbar-row">
-            <span class="dbar-name">IV · Queen's Ward</span>
-            <div class="dbar-track"><div class="dbar-fill" data-w="100"></div></div>
-            <span class="dbar-val">44–58m</span>
-          </div>
-        </div>
-      </div>
+    <div class="fixed-sidebar">
+      <img src="names/print.png" alt="Substrata">
     </div>
-  </section>
 
-  <!-- COMMANDMENTS -->
-  <div class="section-wrap" id="commandments">
-    <div class="glass commandments-panel reveal">
-      <div class="cmd-head">
-        <div>
-          <span class="pill" style="margin-bottom:1.5rem;display:inline-flex;">Colony Code</span>
-          <h2 class="cmd-title">The Five<br>Laws of<br>the Deep</h2>
-        </div>
-        <p class="cmd-intro">Every resident of Substrata receives the Colony Code upon entry. It is not a contract — it is a condition of breath. These laws do not govern behavior. They describe what it means to exist here.</p>
-      </div>
-      <div class="cmd-list">
-        <div class="cmd-item" data-cursor="law I">
-          <div class="cmd-num">Law I</div>
-          <div class="cmd-content">
-            <span class="cmd-text">No resident may ascend beyond their designated stratum without a writ of passage.</span>
-            <span class="cmd-sub">Violations are not punished — they are simply not possible. The passages know who belongs where.</span>
-          </div>
-        </div>
-        <div class="cmd-item" data-cursor="law II">
-          <div class="cmd-num">Law II</div>
-          <div class="cmd-content">
-            <span class="cmd-text">The colony's need supersedes the individual's want. Always.</span>
-            <span class="cmd-sub">Resources are not owned. They are held in trust, distributed by function. To want more than your role requires is to misunderstand what you are.</span>
-          </div>
-        </div>
-        <div class="cmd-item" data-cursor="law III">
-          <div class="cmd-num">Law III</div>
-          <div class="cmd-content">
-            <span class="cmd-text">All children born below Stratum II are citizens of the deep. Their stratum is their birthright — and their ceiling.</span>
-            <span class="cmd-sub">This is not cruelty. It is clarity. The colony does not move upward. It moves inward.</span>
-          </div>
-        </div>
-        <div class="cmd-item" data-cursor="law IV">
-          <div class="cmd-num">Law IV</div>
-          <div class="cmd-content">
-            <span class="cmd-text">Hoarding is exile. The colony remembers what has been taken.</span>
-            <span class="cmd-sub">There are no prisons in Substrata. There is only the surface — which is, for those who have lived below, a sentence of its own.</span>
-          </div>
-        </div>
-        <div class="cmd-item" data-cursor="law V">
-          <div class="cmd-num">Law V</div>
-          <div class="cmd-content">
-            <span class="cmd-text">The surface is not forbidden. It is simply irrelevant.</span>
-            <span class="cmd-sub">Scouts return with reports. No one asks to go back. Solitude dissolves where the whole persists.</span>
-          </div>
-        </div>
-      </div>
+    <div class="eyebrow-wrap">
+      <span class="hero-eyebrow">Loneliness is a surface world condition. We are the cure. &nbsp;·&nbsp; Substrata
+        Colony · Est. Year Zero &nbsp;·&nbsp; 58m · 4 Strata · 12,000 Residents &nbsp;·&nbsp; All depths. All functions.
+        &nbsp;·&nbsp; </span>
     </div>
-  </div>
 
-  <!-- QUOTE 1 -->
-  <div class="section-wrap">
-    <div class="glass quote-1-panel reveal">
-      <div class="q1-aside">
-        <div class="q1-num">01</div>
-        <div class="q1-label">Founding Charter</div>
-      </div>
-      <div>
-        <p class="q1-text">"We did not descend because the surface failed us. We descended because we understood, finally, that the deepest connections are always the ones made underground — in the dark, in the pressure, in the shared necessity of warmth."</p>
-        <p class="q1-attr">— Founding Charter of Substrata, Year Zero</p>
-      </div>
-    </div>
-  </div>
+    <section class="hero" id="hero">
+      <h1 class="hero-title reveal">
+        <img src="names/substrata.png" alt="Substrata">
+      </h1>
 
-  <!-- MAP -->
-  <div class="section-wrap" id="map">
-    <div class="glass map-panel reveal">
-      <div class="map-header">
-        <div class="map-title-group">
-          <span class="pill" style="width:fit-content;">Cartography · Level Survey</span>
-          <h2 class="map-title">The Colony, Mapped</h2>
-        </div>
-        <span class="pill">Cross-section · Not to scale</span>
-      </div>
-      <div class="map-img-wrap">
-        <img src="images/aaa.png" alt="Substrata Colony Map">
-      </div>
-      <div class="stats-band">
-        <div class="stat-card reveal" data-cursor="58 metres">
-          <div class="stat-n">58m</div>
-          <div class="stat-l">Maximum Depth</div>
-        </div>
-        <div class="stat-card reveal reveal-delay-1" data-cursor="4 strata">
-          <div class="stat-n">4</div>
-          <div class="stat-l">Strata</div>
-        </div>
-        <div class="stat-card reveal reveal-delay-2" data-cursor="12,000 residents">
-          <div class="stat-n">12,000</div>
-          <div class="stat-l">Residents</div>
-        </div>
-      </div>
-    </div>
-  </div>
+      <div class="glass hero-glass reveal reveal-delay-1">
+        <p class="hero-sub">Substrata was not built — it was excavated.<br><br>
+          Chamber by chamber, passage by passage, its founders carved meaning from earth and stone, studying systems
+          that had long existed beneath notice: ant colonies, their density, their persistence, the way they appear
+          precisely when absence feels most complete.<br><br>
+          What emerged was not merely shelter, but a system. A living geometry of mutual purpose. Every resident is both
+          cell and organism. Every corridor connects.</p>
 
-  <!-- STRATA -->
-  <div class="section-wrap" id="strata">
-    <div class="glass strata-panel reveal">
-      <div class="strata-header">
-        <div>
-          <span class="pill" style="margin-bottom:1.2rem;display:inline-flex;">Social Architecture</span>
-          <h2 class="strata-title">The Four<br><em>
-            <img src="names/strata.png" alt="Strata" style="height:1.1em;vertical-align:middle;">
-          </em></h2>
-        </div>
-        <p class="strata-intro">Substrata is a stratified colony. Depth is not a logistic — it is a social contract. Each stratum has its own light, its own language, and its own law. To descend is to commit. There is no casual passage between worlds.</p>
-      </div>
-      <div class="strata-grid">
-        <div class="strata-card reveal" data-cursor="hover to descend">
-          <div class="strata-card-inner">
-            <div class="strata-card-num">I</div>
-            <div class="strata-depth"><div class="depth-pip"></div>0 – 12 metres</div>
-            <h3 class="strata-name">The Threshold</h3>
-            <p class="strata-desc">Entry halls, transit bays, welcome chambers. Light still filters through the grates above. The air smells of outside.</p>
+        <div class="hero-meta">
+          <div class="hero-pills">
+            <span class="pill" data-cursor="4 strata">4 Strata</span>
+            <span class="pill" data-cursor="58 metres">58m Depth</span>
+            <span class="pill" data-cursor="12,000 souls">12,000 Residents</span>
           </div>
-          <div class="strata-overlay">
-            <div class="strata-overlay-num">I</div>
-            <div class="strata-overlay-depth">0 – 12 metres</div>
-            <div class="strata-overlay-name">The Threshold</div>
-            <div class="strata-overlay-desc">New arrivals begin here. The scent of outside fades within a week. Most residents stop noticing after a month.</div>
-          </div>
-        </div>
-        <div class="strata-card reveal reveal-delay-1" data-cursor="hover to descend">
-          <div class="strata-card-inner">
-            <div class="strata-card-num">II</div>
-            <div class="strata-depth"><div class="depth-pip"></div>12 – 28 metres</div>
-            <h3 class="strata-name">The Working Belt</h3>
-            <p class="strata-desc">Markets, workshops, residences. The hum of the colony is loudest here. No natural light penetrates this far.</p>
-          </div>
-          <div class="strata-overlay">
-            <div class="strata-overlay-num">II</div>
-            <div class="strata-overlay-depth">12 – 28 metres</div>
-            <div class="strata-overlay-name">The Working Belt</div>
-            <div class="strata-overlay-desc">Bioluminescent fungi line the lower corridors — planted in Year Two, they have not stopped growing.</div>
-          </div>
-        </div>
-        <div class="strata-card reveal reveal-delay-2" data-cursor="hover to descend">
-          <div class="strata-card-inner">
-            <div class="strata-card-num">III</div>
-            <div class="strata-depth"><div class="depth-pip"></div>28 – 44 metres</div>
-            <h3 class="strata-name">The Inner Ring</h3>
-            <p class="strata-desc">Archives, nurseries, food stores. Only those with clearance descend here. Time moves differently.</p>
-          </div>
-          <div class="strata-overlay">
-            <div class="strata-overlay-num">III</div>
-            <div class="strata-overlay-depth">28 – 44 metres</div>
-            <div class="strata-overlay-name">The Inner Ring</div>
-            <div class="strata-overlay-desc">The children born here do not know what seasons are. The walls glow faintly with bioluminescent moss.</div>
-          </div>
-        </div>
-        <div class="strata-card reveal reveal-delay-3" data-cursor="hover to descend">
-          <div class="strata-card-inner">
-            <div class="strata-card-num">IV</div>
-            <div class="strata-depth"><div class="depth-pip"></div>44 – 58 metres</div>
-            <h3 class="strata-name">The Queen's Ward</h3>
-            <p class="strata-desc">Reserved. Access is not granted — it is inherited. Those who dwell here have never seen the surface.</p>
-          </div>
-          <div class="strata-overlay">
-            <div class="strata-overlay-num">IV</div>
-            <div class="strata-overlay-depth">44 – 58 metres</div>
-            <div class="strata-overlay-name">The Queen's Ward</div>
-            <div class="strata-overlay-desc">They govern by precedent, which is the only law that matters underground. The deepest and most sacred stratum.</div>
+          <div class="depth-bars" id="depth-bars">
+            <div class="dbar-row">
+              <span class="dbar-name">I · Threshold</span>
+              <div class="dbar-track">
+                <div class="dbar-fill" data-w="21"></div>
+              </div>
+              <span class="dbar-val">0–12m</span>
+            </div>
+            <div class="dbar-row">
+              <span class="dbar-name">II · Working Belt</span>
+              <div class="dbar-track">
+                <div class="dbar-fill" data-w="48"></div>
+              </div>
+              <span class="dbar-val">12–28m</span>
+            </div>
+            <div class="dbar-row">
+              <span class="dbar-name">III · Inner Ring</span>
+              <div class="dbar-track">
+                <div class="dbar-fill" data-w="76"></div>
+              </div>
+              <span class="dbar-val">28–44m</span>
+            </div>
+            <div class="dbar-row">
+              <span class="dbar-name">IV · Queen's Ward</span>
+              <div class="dbar-track">
+                <div class="dbar-fill" data-w="100"></div>
+              </div>
+              <span class="dbar-val">44–58m</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </div>
+    </section>
 
-  <!-- INTERLUDE -->
-  <div class="section-wrap full interlude">
-    <div class="interlude-wrap">
-      <span class="interlude-text">SUBSTRATA · EST. YEAR ZERO · ALL DEPTHS · ALL FUNCTIONS · SUBSTRATA · EST. YEAR ZERO · ALL DEPTHS · ALL FUNCTIONS · &nbsp;</span>
-      <span class="interlude-text" aria-hidden="true">SUBSTRATA · EST. YEAR ZERO · ALL DEPTHS · ALL FUNCTIONS · SUBSTRATA · EST. YEAR ZERO · ALL DEPTHS · ALL FUNCTIONS · &nbsp;</span>
-    </div>
-  </div>
-
-  <!-- ROLES -->
-  <div class="section-wrap" id="roles">
-    <div class="glass roles-panel reveal">
-      <div class="roles-header">
-        <div>
-          <span class="pill" style="margin-bottom:1.2rem;display:inline-flex;">Colony Function</span>
-          <h2 class="roles-title">Who You<br>Will Become</h2>
-        </div>
-        <p class="roles-intro">Every resident of Substrata carries a function. You did not choose it — it was assigned by the Stratum Council upon intake. You will grow into it. You always do.</p>
-      </div>
-      <div class="roles-grid">
-        <div class="role-card reveal" data-cursor="worker">
-          <div class="role-glyph">WW</div>
-          <div class="role-stratum">Stratum I – II</div>
-          <h3 class="role-name">The Worker</h3>
-          <p class="role-desc">Maintains passages, operates the food lines, builds new chambers. The colony moves because they move. Most residents become workers. This is not a lesser fate — it is the most essential one.</p>
-          <div class="role-obligation">Obligation — <span>movement, maintenance, endurance</span></div>
-        </div>
-        <div class="role-card reveal reveal-delay-1" data-cursor="scout">
-          <div class="role-glyph">SS</div>
-          <div class="role-stratum">Stratum I</div>
-          <h3 class="role-name">The Scout</h3>
-          <p class="role-desc">Navigates the boundary zones. Sometimes ascends. Scouts are often quieter than other residents. They have seen things that do not translate into the language of the underground.</p>
-          <div class="role-obligation">Obligation — <span>observation, boundary, return</span></div>
-        </div>
-        <div class="role-card reveal reveal-delay-2" data-cursor="keeper">
-          <div class="role-glyph">KK</div>
-          <div class="role-stratum">Stratum III</div>
-          <h3 class="role-name">The Keeper</h3>
-          <p class="role-desc">Tends the archives, the nurseries, the deep stores. When a Keeper appears in Stratum I, something important has changed.</p>
-          <div class="role-obligation">Obligation — <span>memory, care, continuity</span></div>
-        </div>
-        <div class="role-card reveal reveal-delay-3" data-cursor="elder">
-          <div class="role-glyph">EE</div>
-          <div class="role-stratum">Stratum IV</div>
-          <h3 class="role-name">The Elder</h3>
-          <p class="role-desc">Governs by precedent. Inherited, not elected. Has never seen daylight. The Elders believe this makes their judgement purer — unclouded by the distractions of sky and distance.</p>
-          <div class="role-obligation">Obligation — <span>governance, precedent, depth</span></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- QUOTE 2 -->
-  <div class="section-wrap">
-    <div class="glass quote-2-panel reveal">
-      <div class="q2-inner">
-        <span class="pill" style="opacity:.3;border-color:rgba(200,219,212,.2);color:var(--mint-pale);background:rgba(60,80,65,.4);"></span>
-        <p class="q2-text" id="q2-text">"I stopped missing the sun after the first winter. By spring, I had forgotten that missing it was <em>an option.</em>"</p>
-        <p class="q2-attr">— Maren S., Stratum II resident, 15th year</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- FINAL -->
-  <div class="section-wrap" id="final">
-    <div class="glass final-panel reveal">
-      <div class="final-left">
-        <span class="pill" style="width:fit-content;">Residency Programme</span>
-        <h2 class="final-title">A place for those<br>who want to go <em>deeper</em></h2>
-        <p class="final-body">Applications are reviewed by the Stratum Council. Placement is determined by function, not preference. All residents begin in Stratum I. There is no guarantee of descent — only of belonging.</p>
-        <p class="final-note">Processing time: 4–6 weeks · All decisions are final · The colony does not negotiate</p>
-      </div>
-      <div class="form-inner">
-        <div class="form-row">
+    <div class="section-wrap" id="commandments">
+      <div class="glass commandments-panel reveal">
+        <div class="cmd-head">
           <div>
-            <label class="form-label">Full Name</label>
-            <input class="form-input" type="text" placeholder="First and Last" data-cursor="enter name">
+            <span class="pill" style="margin-bottom:1.5rem;display:inline-flex;">Colony Code</span>
+            <h2 class="cmd-title">The Five<br>Laws of<br>the Deep</h2>
           </div>
-          <div>
-            <label class="form-label">Age</label>
-            <input class="form-input" type="number" placeholder="Years lived" data-cursor="enter age">
+          <p class="cmd-intro">Every resident of Substrata receives the Colony Code upon entry. It is not a contract —
+            it is a condition of breath. These laws do not govern behavior. They describe what it means to exist here.
+          </p>
+        </div>
+        <div class="cmd-list">
+          <div class="cmd-item" data-cursor="law I">
+            <div class="cmd-num">Law I</div>
+            <div class="cmd-content">
+              <span class="cmd-text">No resident may ascend beyond their designated stratum without a writ of
+                passage.</span>
+              <span class="cmd-sub">Violations are not punished — they are simply not possible. The passages know who
+                belongs where.</span>
+            </div>
+          </div>
+          <div class="cmd-item" data-cursor="law II">
+            <div class="cmd-num">Law II</div>
+            <div class="cmd-content">
+              <span class="cmd-text">The colony's need supersedes the individual's want. Always.</span>
+              <span class="cmd-sub">Resources are not owned. They are held in trust, distributed by function. To want
+                more than your role requires is to misunderstand what you are.</span>
+            </div>
+          </div>
+          <div class="cmd-item" data-cursor="law III">
+            <div class="cmd-num">Law III</div>
+            <div class="cmd-content">
+              <span class="cmd-text">All children born below Stratum II are citizens of the deep. Their stratum is their
+                birthright — and their ceiling.</span>
+              <span class="cmd-sub">This is not cruelty. It is clarity. The colony does not move upward. It moves
+                inward.</span>
+            </div>
+          </div>
+          <div class="cmd-item" data-cursor="law IV">
+            <div class="cmd-num">Law IV</div>
+            <div class="cmd-content">
+              <span class="cmd-text">Hoarding is exile. The colony remembers what has been taken.</span>
+              <span class="cmd-sub">There are no prisons in Substrata. There is only the surface — which is, for those
+                who have lived below, a sentence of its own.</span>
+            </div>
+          </div>
+          <div class="cmd-item" data-cursor="law V">
+            <div class="cmd-num">Law V</div>
+            <div class="cmd-content">
+              <span class="cmd-text">The surface is not forbidden. It is simply irrelevant.</span>
+              <span class="cmd-sub">Scouts return with reports. No one asks to go back. Solitude dissolves where the
+                whole persists.</span>
+            </div>
           </div>
         </div>
-        <div>
-          <label class="form-label">Occupation / Trade</label>
-          <input class="form-input" type="text" placeholder="What you do on the surface" data-cursor="enter trade">
-        </div>
-        <div>
-          <label class="form-label">Contact</label>
-          <input class="form-input" type="email" placeholder="signal@substrata.col" data-cursor="enter signal">
-        </div>
-        <div>
-          <label class="form-label">Why do you want to descend?</label>
-          <input class="form-input" type="text" placeholder="Be specific. We will know if you are not." data-cursor="be honest">
-        </div>
-        <button class="form-submit" data-cursor="submit">Submit Application</button>
       </div>
     </div>
+
+    <div class="section-wrap">
+      <div class="glass quote-1-panel reveal">
+        <div class="q1-aside">
+          <div class="q1-num">01</div>
+          <div class="q1-label">Founding Charter</div>
+        </div>
+        <div>
+          <p class="q1-text">"We did not descend because the surface failed us. We descended because we understood,
+            finally, that the deepest connections are always the ones made underground — in the dark, in the pressure,
+            in the shared necessity of warmth."</p>
+          <p class="q1-attr">— Founding Charter of Substrata, Year Zero</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-wrap" id="map">
+      <div class="glass map-panel reveal">
+        <div class="map-header">
+          <div class="map-title-group">
+            <span class="pill" style="width:fit-content;">Cartography · Level Survey</span>
+            <h2 class="map-title">The Colony, Mapped</h2>
+          </div>
+          <span class="pill">Cross-section · Not to scale</span>
+        </div>
+        <div class="map-img-wrap">
+          <img src="images/aaa.png" alt="Substrata Colony Map">
+        </div>
+        <div class="stats-band">
+          <div class="stat-card reveal" data-cursor="58 metres">
+            <div class="stat-n">58m</div>
+            <div class="stat-l">Maximum Depth</div>
+          </div>
+          <div class="stat-card reveal reveal-delay-1" data-cursor="4 strata">
+            <div class="stat-n">4</div>
+            <div class="stat-l">Strata</div>
+          </div>
+          <div class="stat-card reveal reveal-delay-2" data-cursor="12,000 residents">
+            <div class="stat-n">12,000</div>
+            <div class="stat-l">Residents</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-wrap" id="strata">
+      <div class="glass strata-panel reveal">
+        <div class="strata-header">
+          <div>
+            <span class="pill" style="margin-bottom:1.2rem;display:inline-flex;">Social Architecture</span>
+            <h2 class="strata-title">The Four<br><em>
+                <img src="names/strata.png" alt="Strata" style="height:1.1em;vertical-align:middle;">
+              </em></h2>
+          </div>
+          <p class="strata-intro">Substrata is a stratified colony. Depth is not a logistic — it is a social contract.
+            Each stratum has its own light, its own language, and its own law. To descend is to commit. There is no
+            casual passage between worlds.</p>
+        </div>
+        <div class="strata-grid">
+          <div class="strata-card reveal" data-cursor="hover to descend">
+            <div class="strata-card-inner">
+              <div class="strata-card-num">I</div>
+              <div class="strata-depth">
+                <div class="depth-pip"></div>0 – 12 metres
+              </div>
+              <h3 class="strata-name">The Threshold</h3>
+              <p class="strata-desc">Entry halls, transit bays, welcome chambers. Light still filters through the grates
+                above. The air smells of outside.</p>
+            </div>
+            <div class="strata-overlay">
+              <div class="strata-overlay-num">I</div>
+              <div class="strata-overlay-depth">0 – 12 metres</div>
+              <div class="strata-overlay-name">The Threshold</div>
+              <div class="strata-overlay-desc">New arrivals begin here. The scent of outside fades within a week. Most
+                residents stop noticing after a month.</div>
+            </div>
+          </div>
+          <div class="strata-card reveal reveal-delay-1" data-cursor="hover to descend">
+            <div class="strata-card-inner">
+              <div class="strata-card-num">II</div>
+              <div class="strata-depth">
+                <div class="depth-pip"></div>12 – 28 metres
+              </div>
+              <h3 class="strata-name">The Working Belt</h3>
+              <p class="strata-desc">Markets, workshops, residences. The hum of the colony is loudest here. No natural
+                light penetrates this far.</p>
+            </div>
+            <div class="strata-overlay">
+              <div class="strata-overlay-num">II</div>
+              <div class="strata-overlay-depth">12 – 28 metres</div>
+              <div class="strata-overlay-name">The Working Belt</div>
+              <div class="strata-overlay-desc">Bioluminescent fungi line the lower corridors — planted in Year Two, they
+                have not stopped growing.</div>
+            </div>
+          </div>
+          <div class="strata-card reveal reveal-delay-2" data-cursor="hover to descend">
+            <div class="strata-card-inner">
+              <div class="strata-card-num">III</div>
+              <div class="strata-depth">
+                <div class="depth-pip"></div>28 – 44 metres
+              </div>
+              <h3 class="strata-name">The Inner Ring</h3>
+              <p class="strata-desc">Archives, nurseries, food stores. Only those with clearance descend here. Time
+                moves differently.</p>
+            </div>
+            <div class="strata-overlay">
+              <div class="strata-overlay-num">III</div>
+              <div class="strata-overlay-depth">28 – 44 metres</div>
+              <div class="strata-overlay-name">The Inner Ring</div>
+              <div class="strata-overlay-desc">The children born here do not know what seasons are. The walls glow
+                faintly with bioluminescent moss.</div>
+            </div>
+          </div>
+          <div class="strata-card reveal reveal-delay-3" data-cursor="hover to descend">
+            <div class="strata-card-inner">
+              <div class="strata-card-num">IV</div>
+              <div class="strata-depth">
+                <div class="depth-pip"></div>44 – 58 metres
+              </div>
+              <h3 class="strata-name">The Queen's Ward</h3>
+              <p class="strata-desc">Reserved. Access is not granted — it is inherited. Those who dwell here have never
+                seen the surface.</p>
+            </div>
+            <div class="strata-overlay">
+              <div class="strata-overlay-num">IV</div>
+              <div class="strata-overlay-depth">44 – 58 metres</div>
+              <div class="strata-overlay-name">The Queen's Ward</div>
+              <div class="strata-overlay-desc">They govern by precedent, which is the only law that matters underground.
+                The deepest and most sacred stratum.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-wrap full interlude">
+      <div class="interlude-wrap">
+        <span class="interlude-text">SUBSTRATA · EST. YEAR ZERO · ALL DEPTHS · ALL FUNCTIONS · SUBSTRATA · EST. YEAR
+          ZERO · ALL DEPTHS · ALL FUNCTIONS · &nbsp;</span>
+        <span class="interlude-text" aria-hidden="true">SUBSTRATA · EST. YEAR ZERO · ALL DEPTHS · ALL FUNCTIONS ·
+          SUBSTRATA · EST. YEAR ZERO · ALL DEPTHS · ALL FUNCTIONS · &nbsp;</span>
+      </div>
+    </div>
+
+    <div class="section-wrap" id="roles">
+      <div class="glass roles-panel reveal">
+        <div class="roles-header">
+          <div>
+            <span class="pill" style="margin-bottom:1.2rem;display:inline-flex;">Colony Function</span>
+            <h2 class="roles-title">Who You<br>Will Become</h2>
+          </div>
+          <p class="roles-intro">Every resident of Substrata carries a function. You did not choose it — it was assigned
+            by the Stratum Council upon intake. You will grow into it. You always do.</p>
+        </div>
+        <div class="roles-grid">
+          <div class="role-card reveal" data-cursor="worker">
+            <div class="role-glyph">WW</div>
+            <div class="role-stratum">Stratum I – II</div>
+            <h3 class="role-name">The Worker</h3>
+            <p class="role-desc">Maintains passages, operates the food lines, builds new chambers. The colony moves
+              because they move. Most residents become workers. This is not a lesser fate — it is the most essential
+              one.</p>
+            <div class="role-obligation">Obligation — <span>movement, maintenance, endurance</span></div>
+          </div>
+          <div class="role-card reveal reveal-delay-1" data-cursor="scout">
+            <div class="role-glyph">SS</div>
+            <div class="role-stratum">Stratum I</div>
+            <h3 class="role-name">The Scout</h3>
+            <p class="role-desc">Navigates the boundary zones. Sometimes ascends. Scouts are often quieter than other
+              residents. They have seen things that do not translate into the language of the underground.</p>
+            <div class="role-obligation">Obligation — <span>observation, boundary, return</span></div>
+          </div>
+          <div class="role-card reveal reveal-delay-2" data-cursor="keeper">
+            <div class="role-glyph">KK</div>
+            <div class="role-stratum">Stratum III</div>
+            <h3 class="role-name">The Keeper</h3>
+            <p class="role-desc">Tends the archives, the nurseries, the deep stores. When a Keeper appears in Stratum I,
+              something important has changed.</p>
+            <div class="role-obligation">Obligation — <span>memory, care, continuity</span></div>
+          </div>
+          <div class="role-card reveal reveal-delay-3" data-cursor="elder">
+            <div class="role-glyph">EE</div>
+            <div class="role-stratum">Stratum IV</div>
+            <h3 class="role-name">The Elder</h3>
+            <p class="role-desc">Governs by precedent. Inherited, not elected. Has never seen daylight. The Elders
+              believe this makes their judgement purer — unclouded by the distractions of sky and distance.</p>
+            <div class="role-obligation">Obligation — <span>governance, precedent, depth</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-wrap">
+      <div class="glass quote-2-panel reveal">
+        <div class="q2-inner">
+          <span class="pill"
+            style="opacity:.3;border-color:rgba(200,219,212,.2);color:var(--mint-pale);background:rgba(60,80,65,.4);"></span>
+          <p class="q2-text" id="q2-text">"I stopped missing the sun after the first winter. By spring, I had forgotten
+            that missing it was <em>an option.</em>"</p>
+          <p class="q2-attr">— Maren S., Stratum II resident, 15th year</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-wrap" id="final">
+      <div class="glass final-panel reveal">
+        <div class="final-left">
+          <span class="pill" style="width:fit-content;">Residency Programme</span>
+          <h2 class="final-title">A place for those<br>who want to go <em>deeper</em></h2>
+          <p class="final-body">Applications are reviewed by the Stratum Council. Placement is determined by function,
+            not preference. All residents begin in Stratum I. There is no guarantee of descent — only of belonging.</p>
+          <p class="final-note">Processing time: 4–6 weeks · All decisions are final · The colony does not negotiate</p>
+        </div>
+        <div class="form-inner">
+          <div class="form-row">
+            <div>
+              <label class="form-label">Full Name</label>
+              <input class="form-input" type="text" placeholder="First and Last" data-cursor="enter name">
+            </div>
+            <div>
+              <label class="form-label">Age</label>
+              <input class="form-input" type="number" placeholder="Years lived" data-cursor="enter age">
+            </div>
+          </div>
+          <div>
+            <label class="form-label">Occupation / Trade</label>
+            <input class="form-input" type="text" placeholder="What you do on the surface" data-cursor="enter trade">
+          </div>
+          <div>
+            <label class="form-label">Contact</label>
+            <input class="form-input" type="email" placeholder="signal@substrata.col" data-cursor="enter signal">
+          </div>
+          <div>
+            <label class="form-label">Why do you want to descend?</label>
+            <input class="form-input" type="text" placeholder="Be specific. We will know if you are not."
+              data-cursor="be honest">
+          </div>
+          <button class="form-submit" data-cursor="submit">Submit Application</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANT SWARM CANVAS -->
+    <canvas id="bg-canvas"></canvas>
+
+    <footer>
+      <span>Substrata · Est. Year Zero</span>
+      <span>All strata · All depths</span>
+      <span>You are here</span>
+    </footer>
+
   </div>
 
-  <!-- FOOTER -->
-  <footer>
-    <span>Substrata · Est. Year Zero</span>
-    <span>All strata · All depths</span>
-    <span>You are here</span>
-  </footer>
+  <script>// --- 1. SLOWER, CLUSTERED SWARM ---
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+    let ants = [];
+    const mouse = { x: -1000, y: -1000 };
 
-</div><!-- /.page -->
+    const VISUAL_RANGE = 50;
+    const COHESION_STRENGTH = 0.005;
+    const ALIGNMENT_STRENGTH = 0.05;
+    const SEPARATION_STRENGTH = 0.05;
+    const MIN_DISTANCE = 15;
 
-<script>
-/* ── CURSOR ── */
-const cursor      = document.getElementById('cursor');
-const cursorLabel = document.getElementById('cursor-label');
-
-document.addEventListener('mousemove', e => {
-  cursor.style.left = e.clientX + 'px';
-  cursor.style.top  = e.clientY + 'px';
-  document.body.classList.add('cur-active');
-});
-
-document.querySelectorAll('[data-cursor]').forEach(el => {
-  el.addEventListener('mouseenter', () => {
-    cursorLabel.textContent = el.dataset.cursor;
-    document.body.classList.add('cur-hover');
-  });
-  el.addEventListener('mouseleave', () => {
-    cursorLabel.textContent = '';
-    document.body.classList.remove('cur-hover');
-  });
-});
-
-/* ── SCROLL REVEALS ── */
-const revObs = new IntersectionObserver(entries => {
-  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); revObs.unobserve(e.target); } });
-}, { threshold: 0.1 });
-document.querySelectorAll('.reveal').forEach(el => revObs.observe(el));
-
-/* ── DEPTH BARS ── */
-const barObs = new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      document.querySelectorAll('.dbar-fill').forEach(f => { f.style.width = f.dataset.w + '%'; f.classList.add('loaded'); });
-      barObs.disconnect();
+    function resize() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
     }
-  });
-}, { threshold: 0.3 });
-const barsEl = document.getElementById('depth-bars');
-if (barsEl) barObs.observe(barsEl);
+    window.addEventListener('resize', resize);
+    resize();
 
-/* ── DEPTH RAIL ── */
-const railLabels = document.querySelectorAll('.depth-rail-label');
-const secObs = new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      railLabels.forEach(l => l.classList.toggle('active', l.dataset.target === e.target.id));
-    }
-  });
-}, { threshold: 0.4 });
-['hero','commandments','map','strata','roles','final'].forEach(id => {
-  const el = document.getElementById(id);
-  if (el) secObs.observe(el);
-});
-
-/* ── Q2 WORD REVEAL ── */
-const q2 = document.getElementById('q2-text');
-if (q2) {
-  q2.innerHTML = q2.innerHTML.replace(/(\S+)/g, '<span class="q2-word">$1</span>');
-  const words = q2.querySelectorAll('.q2-word');
-  const wObs = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        words.forEach((w,i) => setTimeout(() => w.classList.add('show'), i * 58));
-        wObs.disconnect();
-      }
+    document.addEventListener('mousemove', e => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
     });
-  }, { threshold: 0.5 });
-  wObs.observe(q2);
-}
-</script>
-</body>
-</html>
+
+    class Ant {
+      constructor() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        // Slower initial speeds
+        this.vx = (Math.random() - 0.5) * 1.5;
+        this.vy = (Math.random() - 0.5) * 1.5;
+        this.size = 1.5;
+      }
+
+      update() {
+        let centerX = 0, centerY = 0, avgVx = 0, avgVy = 0, closeDx = 0, closeDy = 0;
+        let neighbors = 0;
+
+        for (let other of ants) {
+          if (other === this) continue;
+          let dx = other.x - this.x;
+          let dy = other.y - this.y;
+          let distSq = dx * dx + dy * dy;
+
+          if (distSq < VISUAL_RANGE * VISUAL_RANGE) {
+            centerX += other.x;
+            centerY += other.y;
+            avgVx += other.vx;
+            avgVy += other.vy;
+            neighbors++;
+
+            if (distSq < MIN_DISTANCE * MIN_DISTANCE) {
+              closeDx += this.x - other.x;
+              closeDy += this.y - other.y;
+            }
+          }
+        }
+
+        if (neighbors > 0) {
+          this.vx += ((centerX / neighbors) - this.x) * COHESION_STRENGTH;
+          this.vy += ((centerY / neighbors) - this.y) * COHESION_STRENGTH;
+          this.vx += ((avgVx / neighbors) - this.vx) * ALIGNMENT_STRENGTH;
+          this.vy += ((avgVy / neighbors) - this.vy) * ALIGNMENT_STRENGTH;
+        }
+
+        this.vx += closeDx * SEPARATION_STRENGTH;
+        this.vy += closeDy * SEPARATION_STRENGTH;
+
+        // Mouse avoidance (slower push)
+        let mDx = this.x - mouse.x;
+        let mDy = this.y - mouse.y;
+        let mDist = Math.sqrt(mDx * mDx + mDy * mDy);
+        if (mDist < 80) {
+          this.vx += mDx * 0.01;
+          this.vy += mDy * 0.01;
+        }
+
+        // Lower jitter (less frantic, more calm)
+        this.vx += (Math.random() - 0.5) * 0.2;
+        this.vy += (Math.random() - 0.5) * 0.2;
+
+        // Slower Speed Cap (Changed from 4 to 2)
+        let speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+        if (speed > 2) {
+          this.vx = (this.vx / speed) * 2;
+          this.vy = (this.vy / speed) * 2;
+        }
+
+        this.x += this.vx;
+        this.y += this.vy;
+
+        if (this.x < 0) this.x = width;
+        if (this.x > width) this.x = 0;
+        if (this.y < 0) this.y = height;
+        if (this.y > height) this.y = 0;
+      }
+
+      draw() {
+        ctx.fillStyle = '#474c43';
+        ctx.fillRect(this.x, this.y, this.size, this.size);
+      }
+    }
+
+    for (let i = 0; i < 250; i++) ants.push(new Ant());
+
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+      ants.forEach(a => { a.update(); a.draw(); });
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+
+    // --- 2. ORIGINAL UI FUNCTIONALITY ---
+    const revObs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          revObs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => revObs.observe(el));
+
+    const barObs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          document.querySelectorAll('.dbar-fill').forEach(f => {
+            f.style.width = f.dataset.w + '%';
+            f.classList.add('loaded');
+          });
+          barObs.disconnect();
+        }
+      });
+    }, { threshold: 0.3 });
+    const barsEl = document.getElementById('depth-bars');
+    if (barsEl) barObs.observe(barsEl);
+
+    const railLabels = document.querySelectorAll('.depth-rail-label');
+    const secObs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          railLabels.forEach(l => l.classList.toggle('active', l.dataset.target === e.target.id));
+        }
+      });
+    }, { threshold: 0.4 });
+    ['hero', 'commandments', 'map', 'strata', 'roles', 'final'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) secObs.observe(el);
+    });
+
+    const q2 = document.getElementById('q2-text');
+    if (q2) {
+      q2.innerHTML = q2.innerHTML.replace(/(\S+)/g, '<span class="q2-word">$1</span>');
+      const words = q2.querySelectorAll('.q2-word');
+      const wObs = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            words.forEach((w, i) => setTimeout(() => w.classList.add('show'), i * 58));
+            wObs.disconnect();
+          }
+        });
+      }, { threshold: 0.5 });
+      wObs.observe(q2);
+    }
+
+    const heroLogo = document.querySelector('.hero-title img');
+    const sidebar = document.querySelector('.fixed-sidebar');
+    const sideObs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        sidebar.style.opacity = entry.isIntersecting ? '0' : '1';
+        sidebar.style.pointerEvents = entry.isIntersecting ? 'none' : 'auto';
+      });
+    });
+    if (heroLogo) sideObs.observe(heroLogo);
+  </script>
